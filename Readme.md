@@ -455,7 +455,7 @@ bidnest/
 For issues, questions, or support:
 
 - Email: Mdnasif17@gmail.com
-- GitHub: [repository-url]
+- GitHub: https://github.com/MdNasif2000/bidnest.git
 
 ---
 
