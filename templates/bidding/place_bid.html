@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Place Bid - {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body" style="padding: 30px;">
+                    <h2 style="color: #2c3e50; margin-bottom: 20px;">Place Your Bid</h2>
+                    
+                    <!-- Property Summary -->
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                        <h4 style="color: #2c3e50; margin-bottom: 15px;">{{ property.title }}</h4>
+                        <p style="color: #666; margin-bottom: 10px;"><i class="fas fa-map-marker-alt"></i> {{ property.address }}, {{ property.city }}</p>
+                        <div style="display: flex; gap: 20px; margin-top: 15px;">
+                            <div>
+                                <strong>Starting Bid:</strong> £{{ property.starting_bid }}
+                            </div>
+                            <div>
+                                <strong>Current Bid:</strong> £{{ property.current_bid }}
+                            </div>
+                            <div>
+                                <strong>Rent/Month:</strong> £{{ property.rent_per_month }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bid Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="{{ form.amount.id_for_label }}" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">{{ form.amount.label }}</label>
+                            <input type="number" name="amount" id="{{ form.amount.id_for_label }}" class="form-control" step="0.01" min="{{ property.starting_bid }}" value="{{ form.amount.value|default:property.starting_bid }}" required>
+                            {% if form.amount.errors %}
+                                <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ form.amount.errors }}</div>
+                            {% endif %}
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> Minimum bid: £{{ property.starting_bid }}
+                            </small>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label for="{{ form.message.id_for_label }}" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">{{ form.message.label }}</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ form.message.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px; font-size: 16px; background: #3498db; border: none; border-radius: 5px;">
+                                <i class="fas fa-gavel"></i> Place Bid
+                            </button>
+                            <a href="{% url 'property_detail' property.id %}" class="btn btn-secondary" style="flex: 1; padding: 12px; font-size: 16px; text-align: center; background: #95a5a6; border: none; border-radius: 5px; color: white; text-decoration: none;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+</style>
+{% endblock %}

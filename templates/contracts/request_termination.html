@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Request Contract Termination{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/contracts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="contract-container">
+    <div class="contract-header">
+        <a href="{% url 'contract_detail' contract.id %}" class="contract-back-link">
+            <i class="fas fa-arrow-left"></i> Back to Contract
+        </a>
+        <h1>Request Early Termination</h1>
+        <p>Request to terminate the contract before the end date</p>
+    </div>
+
+    <div class="contract-info-card">
+        <h3>Contract Details</h3>
+        <div class="contract-info-grid">
+            <div class="contract-info-item">
+                <strong>Property</strong>
+                <p>{{ contract.property.title }}</p>
+            </div>
+            <div class="contract-info-item">
+                <strong>Current End Date</strong>
+                <p class="contract-date">{{ contract.end_date|date:"d M Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="contract-info-card">
+        <h3>Termination Request</h3>
+        <p style="color: #666; margin-bottom: 25px;">
+            Please provide details about why you wish to terminate this contract early. 
+            The other party will need to approve this request.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 600; color: #2c3e50; margin-bottom: 8px;">
+                    Reason for Termination *
+                </label>
+                <select name="reason" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px;">
+                    <option value="">Select a reason...</option>
+                    <option value="mutual_agreement">Mutual Agreement</option>
+                    <option value="breach_of_contract">Breach of Contract</option>
+                    <option value="property_issues">Property Issues</option>
+                    <option value="personal_circumstances">Personal Circumstances</option>
+                    <option value="relocation">Relocation</option>
+                    <option value="financial_hardship">Financial Hardship</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 600; color: #2c3e50; margin-bottom: 8px;">
+                    Details *
+                </label>
+                <textarea name="reason_details" rows="5" required placeholder="Please provide detailed explanation for the termination request..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; font-family: inherit;"></textarea>
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Be specific about the circumstances leading to this request
+                </small>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 600; color: #2c3e50; margin-bottom: 8px;">
+                    Proposed Termination Date *
+                </label>
+                <input type="date" name="proposed_termination_date" id="proposed_date" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px;">
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    When you would like the contract to end
+                </small>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <label style="display: block; font-weight: 600; color: #2c3e50; margin-bottom: 8px;">
+                    Notice Period (days)
+                </label>
+                <input type="number" name="notice_period_days" value="30" min="0" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px;">
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Standard notice period is 30 days
+                </small>
+            </div>
+
+            <div style="background: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 25px;">
+                <strong style="color: #856404; display: block; margin-bottom: 8px;">
+                    <i class="fas fa-info-circle"></i> Important Information
+                </strong>
+                <ul style="margin: 0; padding-left: 20px; color: #856404;">
+                    <li>The other party must approve this termination request</li>
+                    <li>Both parties should agree on any financial settlements</li>
+                    <li>You may be liable for rent until the termination date</li>
+                    <li>Deposit return will be handled according to the tenancy agreement</li>
+                </ul>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" style="flex: 1; padding: 14px; background: #dc3545; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 15px; cursor: pointer;">
+                    <i class="fas fa-file-contract"></i> Submit Termination Request
+                </button>
+                <a href="{% url 'contract_detail' contract.id %}" style="flex: 1; padding: 14px; background: #6c757d; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; text-align: center;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const proposedDateInput = document.getElementById('proposed_date');
+    const today = new Date().toISOString().split('T')[0];
+    const startDate = '{{ contract.start_date|date:"Y-m-d" }}';
+    const endDate = '{{ contract.end_date|date:"Y-m-d" }}';
+    
+    // Set minimum to the later of today or start date
+    const minDate = today > startDate ? today : startDate;
+    proposedDateInput.setAttribute('min', minDate);
+    proposedDateInput.setAttribute('max', endDate);
+});
+</script>
+{% endblock %}

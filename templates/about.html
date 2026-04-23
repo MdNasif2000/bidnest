@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="static-page">
+    <div class="container">
+        <div class="page-header">
+            <h1>About BidNest</h1>
+            <p class="lead">Where Every Bid Counts</p>
+        </div>
+
+        <div class="page-content">
+            <section class="content-section">
+                <h2>Our Mission</h2>
+                <p>BidNest is revolutionizing the student accommodation marketplace by creating a transparent, fair, and efficient platform where students can find their perfect home and landlords can connect with verified tenants.</p>
+            </section>
+
+            <section class="content-section">
+                <h2>What We Do</h2>
+                <p>We provide a unique bidding platform that empowers students to:</p>
+                <ul>
+                    <li>Browse verified student accommodations</li>
+                    <li>Place competitive bids on properties they love</li>
+                    <li>Communicate directly with landlords</li>
+                    <li>Sign contracts digitally</li>
+                    <li>Manage payments securely</li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h2>For Landlords</h2>
+                <p>BidNest helps property owners:</p>
+                <ul>
+                    <li>List properties to verified students</li>
+                    <li>Receive competitive bids</li>
+                    <li>Screen potential tenants</li>
+                    <li>Manage contracts and payments online</li>
+                    <li>Build their reputation through reviews</li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h2>Why Choose BidNest?</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <h3>🔒 Secure</h3>
+                        <p>All users are verified and transactions are protected</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>💰 Fair Pricing</h3>
+                        <p>Bidding system ensures competitive and fair rental prices</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>📱 Easy to Use</h3>
+                        <p>Simple, intuitive platform accessible anywhere</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>⚡ Fast Process</h3>
+                        <p>From search to contract signing, all in one place</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

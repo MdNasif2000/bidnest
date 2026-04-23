@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Received Bids{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/bidding.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2 style="color: #2c3e50; margin: 0;">Received Bids</h2>
+        
+        <!-- Filter by Status -->
+        <div>
+            <select id="statusFilter" class="form-control" style="width: 200px;" onchange="filterBids()">
+                <option value="">All Bids</option>
+                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="accepted" {% if status_filter == 'accepted' %}selected{% endif %}>Accepted</option>
+                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                <option value="countered" {% if status_filter == 'countered' %}selected{% endif %}>Countered</option>
+                <option value="withdrawn" {% if status_filter == 'withdrawn' %}selected{% endif %}>Withdrawn</option>
+            </select>
+        </div>
+    </div>
+
+    {% if bids %}
+        <div class="bids-container">
+            {% for bid in bids %}
+            <div class="bid-card">
+                <div class="bid-card-content">
+                    <!-- Property Image -->
+                    <div class="bid-image">
+                        {% if bid.property.images.first %}
+                            <img src="{{ bid.property.images.first.image.url }}" alt="{{ bid.property.title }}">
+                        {% else %}
+                            <img src="{% static 'images/property.jpg' %}" alt="Property">
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Property & Student Info -->
+                    <div class="bid-info">
+                        <div class="bid-header">
+                            <h4 class="bid-title">
+                                <a href="{% url 'property_detail' bid.property.id %}">{{ bid.property.title }}</a>
+                            </h4>
+                            <span class="bid-status status-{{ bid.status }}">{{ bid.get_status_display }}</span>
+                        </div>
+                        <p class="bid-student"><i class="fas fa-user"></i> {{ bid.student.get_full_name|default:bid.student.username }}</p>
+                        <p class="bid-date"><i class="fas fa-clock"></i> {{ bid.created_at|date:"d M Y" }}</p>
+                    </div>
+                    
+                    <!-- Bid Amount -->
+                    <div class="bid-amount-section">
+                        <div class="bid-amount">
+                            <span class="amount-label">Bid Amount</span>
+                            <span class="amount-value">£{{ bid.amount }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="bid-actions">
+                        {% if bid.status == 'pending' or bid.status == 'countered' %}
+                            <a href="{% url 'accept_bid' bid.id %}" class="btn-action btn-accept">Accept</a>
+                            <a href="{% url 'counter_offer' bid.id %}" class="btn-action btn-counter">Counter</a>
+                            <a href="{% url 'reject_bid' bid.id %}" class="btn-action btn-decline">Reject</a>
+                        {% elif bid.status == 'accepted' %}
+                            <a href="{% url 'generate_contract' bid.id %}" class="btn-action btn-accept" style="background: #28a745;">
+                                <i class="fas fa-file-contract"></i> Generate Contract
+                            </a>
+                            <a href="{% url 'bid_detail' bid.id %}" class="btn-action btn-view">View Details</a>
+                        {% else %}
+                            <a href="{% url 'bid_detail' bid.id %}" class="btn-action btn-view">View Details</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card shadow-sm" style="padding: 60px; text-align: center;">
+            <i class="fas fa-inbox" style="font-size: 60px; color: #ddd; margin-bottom: 20px;"></i>
+            <h4 style="color: #666; margin-bottom: 15px;">No Bids Received</h4>
+            <p style="color: #999; margin-bottom: 0;">You haven't received any bids on your properties yet.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function filterBids() {
+    const status = document.getElementById('statusFilter').value;
+    if (status) {
+        window.location.href = '?status=' + status;
+    } else {
+        window.location.href = window.location.pathname;
+    }
+}
+</script>
+{% endblock %}

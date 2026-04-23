@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section with Background Image -->
+<section class="hero-section">
+    <img src="{% static 'images/hero_bg.jpg' %}" alt="Student Houses" class="hero-bg-full">
+    <div class="hero-content">
+        <h1 class="hero-title">FIND, BID AND MOVE-<br>ALL IN ONE PLACE</h1>
+    </div>
+    
+    <!-- Search Box Overlay -->
+    <div class="search-box-overlay">
+        <div class="search-box">
+            <h2>Search your Off-Campus House</h2>
+            
+            <form action="{% url 'property_list' %}" method="get" class="search-form">
+                <div class="property-type-filters">
+                    <label><input type="radio" name="property_type_filter" value="all" checked> <span>All Properties</span></label>
+                    <label><input type="radio" name="property_type_filter" value="whole"> <span>Whole Property</span></label>
+                    <label><input type="radio" name="property_type_filter" value="room"> <span>Rooms</span></label>
+                    <label><input type="radio" name="property_type_filter" value="buddy"> <span>House Buddy</span></label>
+                    <label><input type="radio" name="property_type_filter" value="roomie"> <span>Roomie</span></label>
+                </div>
+                
+                <div class="search-inputs-row">
+                    <select name="campus" class="search-select">
+                        <option value="">Campus</option>
+                        <option value="city">City Campus</option>
+                        <option value="north">North Campus</option>
+                        <option value="south">South Campus</option>
+                    </select>
+                    
+                    <select name="academic_year" class="search-select">
+                        <option value="">Academic Year</option>
+                        <option value="2025/2026">2025/2026</option>
+                        <option value="2026/2027">2026/2027</option>
+                    </select>
+                    
+                    <div class="rent-dropdown-wrapper">
+                        <button type="button" class="search-select rent-toggle" id="rentToggle">
+                            Rent £
+                        </button>
+                        <div class="rent-inputs" id="rentInputs" style="display: none;">
+                            <input type="number" name="min_price" placeholder="Min £" class="rent-input" min="0">
+                            <input type="number" name="max_price" placeholder="Max £" class="rent-input" min="0">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-search">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works-section" id="how-it-works">
+    <div class="container">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps-grid">
+            <div class="step-item">
+                <div class="step-icon">
+                    <img src="{% static 'images/search-icon.png' %}" alt="Search" style="width: 60px; height: 60px;">
+                </div>
+                <h3>Search</h3>
+                <p>Find your perfect<br>accommodation<br>from variety of listings</p>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-icon">
+                    <img src="{% static 'images/bid-icon.png' %}" alt="Bid" style="width: 60px; height: 60px;">
+                </div>
+                <h3>Bid</h3>
+                <p>Place bids on your<br>preferred properties</p>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-icon">
+                    <img src="{% static 'images/sign-contract-icon.png' %}" alt="Sign" style="width: 60px; height: 60px;">
+                </div>
+                <h3>Sign</h3>
+                <p>Sign your contract<br>digitally online</p>
+            </div>
+            
+            <div class="step-item">
+                <div class="step-icon">
+                    <img src="{% static 'images/van-icon.png' %}" alt="Move" style="width: 60px; height: 60px;">
+                </div>
+                <h3>Move</h3>
+                <p>Move to your new place<br>hassle-free</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Listings Section -->
+<section class="recent-listings-section">
+    <div class="container">
+        <h2 class="section-title">Recent Listings</h2>
+        <div class="listings-grid" id="listingsGrid">
+            {% for property in recent_properties %}
+            <div class="listing-card" data-property-id="{{ property.id }}" style="cursor: pointer;">
+                <div class="listing-badge">Verified</div>
+                <div class="listing-image-placeholder">
+                    {% if property.images.first %}
+                        <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}" class="listing-image">
+                    {% else %}
+                        <img src="{% static 'images/property.jpg' %}" alt="Property" class="listing-image">
+                    {% endif %}
+                </div>
+                <div class="listing-info">
+                    <h3 class="listing-title">{{ property.title }}</h3>
+                    <div class="listing-prices">
+                        <div class="price-row">
+                            <span class="price-label">Starting Bid:</span>
+                            <span class="price-value">£ {{ property.starting_bid }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Current Bid:</span>
+                            <span class="price-value">£ {{ property.current_bid }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Rent:</span>
+                            <span class="price-value">£ {{ property.rent_per_month }}</span>
+                        </div>
+                    </div>
+                    <div class="listing-features">
+                        <span>🛏️ {{ property.bedrooms }}</span>
+                        <span>🚿 {{ property.bathrooms }}</span>
+                        {% if property.wifi %}<span>📶 WiFi</span>{% endif %}
+                    </div>
+                    <div class="listing-actions">
+                        <a href="{% url 'place_bid' property.id %}" class="btn-place-bid" onclick="event.stopPropagation()">Place Bid</a>
+                        <a href="{% url 'start_conversation' property.landlord.id %}" class="btn-message-landlord" onclick="event.stopPropagation()">Message Landlord</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-listings">
+                <p>No properties available at the moment. Check back soon!</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% if recent_properties %}
+        <div class="show-more-container">
+            <button type="button" class="btn-show-more" id="showMoreBtn">Show More</button>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+    <div class="container">
+        <h2 class="section-title">Testimonials</h2>
+        <p class="section-subtitle">Real Stories, Real Satisfaction</p>
+        <div class="testimonials-grid">
+            {% for review in testimonials %}
+            <div class="testimonial-card">
+                {% if review.is_verified %}
+                <div class="verified-badge" title="Verified Tenant">
+                    <i class="fas fa-check-circle"></i> Verified
+                </div>
+                {% endif %}
+                <h4>{{ review.comment|truncatewords:3 }}</h4>
+                <p>{{ review.comment }}</p>
+                <div class="testimonial-rating">
+                    <span class="stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        {% if review.student.profile_picture %}
+                            <img src="{{ review.student.profile_picture.url }}" alt="{{ review.student.get_full_name }}">
+                        {% else %}
+                            <img src="{% static 'images/user-default-icon.png' %}" alt="User">
+                        {% endif %}
+                    </div>
+                    <div class="author-info">
+                        <span class="author-name">{{ review.student.get_full_name|default:review.student.username }}</span>
+                        <span class="author-university">{{ review.student.university|default:"University" }}</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="testimonial-card">
+                <h4>Easy and Reliable</h4>
+                <p>BidNest is so simple to use & trustworthy. Reliable for the payment. No hassle for physical contract documentation. Time saver.</p>
+                <div class="testimonial-rating">
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="{% static 'images/user-default-icon.png' %}" alt="User">
+                    </div>
+                    <div class="author-info">
+                        <span class="author-name">MR X</span>
+                        <span class="author-university">University</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <h4>Easy and Reliable</h4>
+                <p>BidNest is so simple to use & trustworthy. Reliable for the payment. No hassle for physical contract documentation. Time saver.</p>
+                <div class="testimonial-rating">
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="{% static 'images/user-default-icon.png' %}" alt="User">
+                    </div>
+                    <div class="author-info">
+                        <span class="author-name">MR X</span>
+                        <span class="author-university">University</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <h4>Easy and Reliable</h4>
+                <p>BidNest is so simple to use & trustworthy. Reliable for the payment. No hassle for physical contract documentation. Time saver.</p>
+                <div class="testimonial-rating">
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="{% static 'images/user-default-icon.png' %}" alt="User">
+                    </div>
+                    <div class="author-info">
+                        <span class="author-name">MR X</span>
+                        <span class="author-university">University</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <h4>Easy and Reliable</h4>
+                <p>BidNest is so simple to use & trustworthy. Reliable for the payment. No hassle for physical contract documentation. Time saver.</p>
+                <div class="testimonial-rating">
+                    <span class="stars">★★★★★</span>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="{% static 'images/user-default-icon.png' %}" alt="User">
+                    </div>
+                    <div class="author-info">
+                        <span class="author-name">MR X</span>
+                        <span class="author-university">University</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-grid">
+            <div class="cta-card">
+                <h3>Looking for Accommodation?</h3>
+                <p>Find your favourite student accommodation<br>and place your bid today</p>
+                {% if user.is_authenticated %}
+                <a href="{% url 'add_accommodation_request' %}" class="btn-cta">Advertise</a>
+                {% else %}
+                <a href="{% url 'add_accommodation_request' %}" class="btn-cta">Advertise</a>
+                {% endif %}
+            </div>
+            
+            <div class="cta-card">
+                <h3>Have you got a property?</h3>
+                <p>Post your listing and start receiving bids<br>from verified students</p>
+                {% if user.is_authenticated and user.user_type == 'landlord' %}
+                <a href="{% url 'add_property' %}" class="btn-cta">Post Ad</a>
+                {% else %}
+                <a href="{% url 'register' %}?type=landlord&next={% url 'add_property' %}" class="btn-cta">Post Ad</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

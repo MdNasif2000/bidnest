@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Profile - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="container">
+        <div class="profile-header">
+            <h1>Student Profile</h1>
+            <p>Manage your account information</p>
+        </div>
+
+        <div class="profile-container">
+            <div class="profile-sidebar">
+                <div class="profile-avatar">
+                    {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
+                    {% else %}
+                    <img src="{% static 'images/user-default-icon.png' %}" alt="Profile">
+                    {% endif %}
+                </div>
+                <h2>{{ user.get_full_name|default:user.username }}</h2>
+                <p class="user-type">Student</p>
+                <p class="user-email">{{ user.email }}</p>
+            </div>
+
+            <div class="profile-content">
+                <form method="post" enctype="multipart/form-data" class="profile-form">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="form-errors">
+                        {% for error in form.non_field_errors %}
+                        <p class="error-message">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <h3>Personal Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.university.id_for_label }}">University *</label>
+                        {{ form.university }}
+                        {% if form.university.errors %}
+                        <span class="field-error">{{ form.university.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.course.id_for_label }}">Course</label>
+                        {{ form.course }}
+                        {% if form.course.errors %}
+                        <span class="field-error">{{ form.course.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.year_of_study.id_for_label }}">Year of Study</label>
+                        {{ form.year_of_study }}
+                        {% if form.year_of_study.errors %}
+                        <span class="field-error">{{ form.year_of_study.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <h3>Emergency Contact</h3>
+
+                    <div class="form-group">
+                        <label for="{{ form.emergency_contact_name.id_for_label }}">Emergency Contact Name</label>
+                        {{ form.emergency_contact_name }}
+                        {% if form.emergency_contact_name.errors %}
+                        <span class="field-error">{{ form.emergency_contact_name.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.emergency_contact_phone.id_for_label }}">Emergency Contact Phone</label>
+                        {{ form.emergency_contact_phone }}
+                        {% if form.emergency_contact_phone.errors %}
+                        <span class="field-error">{{ form.emergency_contact_phone.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <h3>About You</h3>
+
+                    <div class="form-group">
+                        <label for="{{ form.bio.id_for_label }}">Bio</label>
+                        {{ form.bio }}
+                        {% if form.bio.errors %}
+                        <span class="field-error">{{ form.bio.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn-save-profile">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

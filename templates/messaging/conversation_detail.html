@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Conversation - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messaging.css' %}">
+<style>
+    /* Hide Django messages on conversation page */
+    .django-messages-container {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="inbox-container">
+    <!-- Header -->
+    <div class="conversation-header-bar">
+        <div class="conversation-header-left">
+            <a href="{% url 'inbox' %}" class="conversation-back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="conversation-avatar">
+                {% if user == conversation.student %}
+                    {{ conversation.landlord.username|slice:":1"|upper }}
+                {% else %}
+                    {{ conversation.student.username|slice:":1"|upper }}
+                {% endif %}
+            </div>
+            <div class="conversation-user-info">
+                <h2>
+                    {% if user == conversation.student %}
+                        {{ conversation.landlord.get_full_name|default:conversation.landlord.username }}
+                    {% else %}
+                        {{ conversation.student.get_full_name|default:conversation.student.username }}
+                    {% endif %}
+                </h2>
+                <p>
+                    {% if user == conversation.student %}
+                        {% if conversation.landlord.user_type == 'student' %}Student{% elif conversation.landlord.user_type == 'landlord' %}Landlord{% else %}User{% endif %}
+                    {% else %}
+                        {% if conversation.student.user_type == 'student' %}Student{% elif conversation.student.user_type == 'landlord' %}Landlord{% else %}User{% endif %}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+        <!-- Delete Button -->
+        <a href="{% url 'delete_conversation' conversation.id %}" class="conversation-delete-header-btn" title="Delete conversation">
+            <i class="fas fa-trash"></i> Delete
+        </a>
+    </div>
+
+    <!-- Messages Area -->
+    <div id="messages-container" class="messages-container">
+        {% if chat_messages %}
+            {% for message in chat_messages %}
+            <div class="message-wrapper {% if message.sender == user %}sent{% else %}received{% endif %}">
+                <div class="message-bubble {% if message.sender == user %}sent{% else %}received{% endif %}">
+                    <p class="message-text">{{ message.content }}</p>
+                    <small class="message-time {% if message.sender == user %}sent{% else %}received{% endif %}">
+                        {{ message.created_at|date:"M d, Y H:i" }}
+                    </small>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="messages-empty">
+                <div class="messages-empty-icon">💬</div>
+                <p>No messages yet. Start the conversation!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Message Input -->
+    <div class="message-input-container">
+        <form method="post" class="message-form">
+            {% csrf_token %}
+            <textarea name="content" id="message-input" rows="2" placeholder="Type your message..." required class="message-textarea" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); this.form.submit(); }"></textarea>
+            <button type="submit" class="message-send-btn">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </form>
+        <small class="message-hint">Press Enter to send, Shift+Enter for new line</small>
+    </div>
+</div>
+
+<script>
+// Auto-scroll to bottom of messages
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messages-container');
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    // Focus on message input
+    document.getElementById('message-input').focus();
+});
+</script>
+{% endblock %}

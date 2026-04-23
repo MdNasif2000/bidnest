@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Contract{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px; max-width: 800px; margin: 0 auto;">
+    <div class="card shadow-sm">
+        <div class="card-body" style="padding: 40px; text-align: center;">
+            <i class="fas fa-file-signature" style="font-size: 60px; color: #3EBFB5; margin-bottom: 20px;"></i>
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">Sign Tenancy Agreement</h2>
+            
+            <!-- Contract Summary -->
+            <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; text-align: left;">
+                <h4 style="color: #2c3e50; margin-bottom: 15px;">Contract Summary</h4>
+                <div style="display: grid; gap: 15px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong style="color: #666;">Property:</strong>
+                        <span style="color: #2c3e50;">{{ contract.property.title }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong style="color: #666;">Monthly Rent:</strong>
+                        <span style="color: #3EBFB5; font-weight: 700;">£{{ contract.monthly_rent }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong style="color: #666;">Deposit:</strong>
+                        <span style="color: #2c3e50; font-weight: 700;">£{{ contract.deposit }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong style="color: #666;">Tenancy Period:</strong>
+                        <span style="color: #2c3e50;">{{ contract.start_date|date:"d M Y" }} - {{ contract.end_date|date:"d M Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warning -->
+            <div style="background: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 30px; text-align: left;">
+                <strong style="color: #856404; display: block; margin-bottom: 10px;">
+                    <i class="fas fa-exclamation-triangle"></i> Important
+                </strong>
+                <p style="color: #856404; margin: 0; font-size: 14px;">
+                    By signing this contract, you agree to all terms and conditions outlined in the tenancy agreement. 
+                    Please ensure you have read and understood all terms before proceeding.
+                </p>
+            </div>
+
+            <!-- Confirmation -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <div style="background: #e7f3ff; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: left;">
+                    <label style="display: flex; align-items: start; cursor: pointer;">
+                        <input type="checkbox" required style="margin-top: 3px; margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                        <span style="color: #0c5460; font-size: 14px;">
+                            I confirm that I have read and agree to all terms and conditions of this tenancy agreement. 
+                            I understand that this is a legally binding contract.
+                        </span>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button type="submit" style="flex: 1; padding: 14px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: 600; font-size: 16px; cursor: pointer;">
+                        <i class="fas fa-pen"></i> Sign Contract
+                    </button>
+                    <a href="{% url 'contract_detail' contract.id %}" style="flex: 1; padding: 14px; background: #6c757d; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 16px;">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+            <p style="color: #999; font-size: 13px; margin-top: 20px;">
+                <i class="fas fa-lock"></i> Your signature is secure and legally binding
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Counter Offer{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body" style="padding: 30px;">
+                    <h2 style="color: #2c3e50; margin-bottom: 20px;">Make Counter Offer</h2>
+                    
+                    <!-- Bid Summary -->
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                        <h5 style="color: #2c3e50; margin-bottom: 15px;">{{ bid.property.title }}</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p style="color: #666; margin-bottom: 8px;"><strong>Student:</strong> {{ bid.student.get_full_name|default:bid.student.username }}</p>
+                                <p style="color: #666; margin-bottom: 0;"><strong>Original Bid:</strong> £{{ bid.amount }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="color: #666; margin-bottom: 8px;"><strong>Starting Bid:</strong> £{{ bid.property.starting_bid }}</p>
+                                <p style="color: #666; margin-bottom: 0;"><strong>Rent/Month:</strong> £{{ bid.property.rent_per_month }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Counter Offer Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="{{ form.counter_amount.id_for_label }}" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">{{ form.counter_amount.label }}</label>
+                            {{ form.counter_amount }}
+                            {% if form.counter_amount.errors %}
+                                <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ form.counter_amount.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label for="{{ form.counter_message.id_for_label }}" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">{{ form.counter_message.label }}</label>
+                            {{ form.counter_message }}
+                            {% if form.counter_message.errors %}
+                                <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ form.counter_message.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button type="submit" class="btn btn-warning" style="flex: 1; padding: 12px; background: #f39c12; color: white; border: none; border-radius: 5px; font-weight: 600; font-size: 16px; cursor: pointer; transition: background 0.2s;">
+                                <i class="fas fa-exchange-alt"></i> Send Counter Offer
+                            </button>
+                            <a href="{% url 'bid_detail' bid.id %}" class="btn btn-secondary" style="flex: 1; padding: 12px; background: #6c757d; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #f39c12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+    }
+    
+    .btn-warning:hover {
+        background: #e67e22 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}

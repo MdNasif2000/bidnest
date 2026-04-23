@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ request.title }} - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/properties.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 30px; margin-bottom: 50px;">
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'accommodation_requests' %}" class="btn-secondary">← Back to Requests</a>
+    </div>
+
+    <div class="property-detail-container">
+        <div class="property-detail-main">
+            <h1>{{ request.title }}</h1>
+            
+            <div class="property-meta" style="margin-bottom: 20px;">
+                <span><i class="icon">👤</i> {{ request.student.get_full_name|default:request.student.username }}</span>
+                <span><i class="icon">📅</i> Posted {{ request.created_at|timesince }} ago</span>
+            </div>
+
+            <div class="property-section">
+                <h2>Requirements</h2>
+                
+                <div class="property-info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Preferred Location</span>
+                        <span class="info-value">{{ request.preferred_location }}</span>
+                    </div>
+
+                    {% if request.accommodation_type %}
+                    <div class="info-item">
+                        <span class="info-label">Accommodation Type</span>
+                        <span class="info-value">{{ request.get_accommodation_type_display }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if request.room_type %}
+                    <div class="info-item">
+                        <span class="info-label">Room Type</span>
+                        <span class="info-value">{{ request.get_room_type_display }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if request.bedrooms_needed %}
+                    <div class="info-item">
+                        <span class="info-label">Bedrooms Needed</span>
+                        <span class="info-value">{{ request.bedrooms_needed }}</span>
+                    </div>
+                    {% endif %}
+
+
+                    {% if request.min_budget and request.max_budget %}
+                    <div class="info-item">
+                        <span class="info-label">Budget Range</span>
+                        <span class="info-value">£{{ request.min_budget }} - £{{ request.max_budget }} per month</span>
+                    </div>
+                    {% endif %}
+
+                    {% if request.move_in_date %}
+                    <div class="info-item">
+                        <span class="info-label">Move-in Date</span>
+                        <span class="info-value">{{ request.move_in_date|date:"d F Y" }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if request.academic_year %}
+                    <div class="info-item">
+                        <span class="info-label">Academic Year</span>
+                        <span class="info-value">{{ request.academic_year }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if request.searching_for %}
+                    <div class="info-item">
+                        <span class="info-label">Searching For</span>
+                        <span class="info-value">{{ request.get_searching_for_display }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if request.gender %}
+                    <div class="info-item">
+                        <span class="info-label">Gender</span>
+                        <span class="info-value">{{ request.get_gender_display }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if request.furnishing_preference %}
+            <div class="property-section">
+                <h2>Furnishing Preference</h2>
+                <p>{{ request.furnishing_preference }}</p>
+            </div>
+            {% endif %}
+
+            <div class="property-section">
+                <h2>Required Amenities</h2>
+                <div class="amenities-list">
+                    {% if request.wifi_required %}
+                    <span class="amenity-badge">✓ WiFi</span>
+                    {% endif %}
+                    {% if request.parking_required %}
+                    <span class="amenity-badge">✓ Parking</span>
+                    {% endif %}
+                    {% if request.garden_required %}
+                    <span class="amenity-badge">✓ Garden</span>
+                    {% endif %}
+                    {% if request.disabled_access_required %}
+                    <span class="amenity-badge">✓ Disabled Access</span>
+                    {% endif %}
+                    {% if request.pets_allowed_required %}
+                    <span class="amenity-badge">✓ Pets Allowed</span>
+                    {% endif %}
+                    
+                    {% if not request.wifi_required and not request.parking_required and not request.garden_required and not request.disabled_access_required and not request.pets_allowed_required %}
+                    <p style="color: #666;">No specific amenities required</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if request.additional_requirements %}
+            <div class="property-section">
+                <h2>Additional Requirements</h2>
+                <p>{{ request.additional_requirements }}</p>
+            </div>
+            {% endif %}
+
+            {% if request.interested_in_buddy_up %}
+            <div class="property-section" style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #3EBFB5;">
+                <h2 style="color: #3EBFB5; margin-top: 0;">🤝 Buddy Ups</h2>
+                <p style="margin: 0;"><strong>I/we are also interested in Buddying up</strong></p>
+                <p style="color: #666; font-size: 14px; margin-top: 10px; margin-bottom: 0;">
+                    This user is open to finding roommates to share a whole flat or house together and start a brand new flat/house share.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="property-detail-sidebar">
+            <div class="sidebar-card">
+                <h3>Contact </h3>
+                <div class="landlord-info">
+                    <p><strong>Name:</strong> {{ request.student.get_full_name|default:request.student.username }}</p>
+                    {% if request.student.email %}
+                    <p><strong>Email:</strong> {{ request.student.email }}</p>
+                    {% endif %}
+                </div>
+                
+                {% if user.is_authenticated and user == request.student %}
+                <!-- Owner Actions -->
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #E0E0E0;">
+                    <p style="font-size: 14px; color: #666; margin-bottom: 15px;">This is your ad</p>
+                    <a href="{% url 'delete_accommodation_request' request.id %}" style="display: block; width: 100%; padding: 12px; background: #DC3545; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: 600;">
+                        🗑️ Delete Ad
+                    </a>
+                </div>
+                {% elif user.is_authenticated and user != request.student %}
+                <a href="{% url 'start_conversation' request.student.id %}" class="btn-primary" style="width: 100%; margin-top: 15px;">Send Message</a>
+                {% elif not user.is_authenticated %}
+                <a href="{% url 'login' %}" class="btn-primary" style="width: 100%; margin-top: 15px;">Login to Contact</a>
+                {% endif %}
+            </div>
+
+            <div class="sidebar-card">
+                <h3>Quick Info</h3>
+                <div class="quick-info">
+                    <div class="info-row">
+                        <span>Posted:</span>
+                        <strong>{{ request.created_at|date:"d M Y" }}</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>Status:</span>
+                        <strong style="color: #27ae60;">Active</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accommodation Seeking Ads - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/properties.css' %}">
+<style>
+    .property-card {
+        position: relative;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .property-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Accommodation Seeking Ads</h1>
+        <p>Browse students looking for accommodation</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: 30px; margin-bottom: 50px;">
+    
+    {% if user.is_authenticated %}
+    <div style="text-align: right; margin-bottom: 20px;">
+        <a href="{% url 'add_accommodation_request' %}" class="btn-primary">Post Your Requirements</a>
+    </div>
+    {% endif %}
+
+    {% if requests %}
+    <div class="property-grid">
+        {% for req in requests %}
+        <div class="property-card" data-request-id="{{ req.id }}" style="cursor: pointer;" onclick="window.location.href='{% url 'accommodation_request_detail' req.id %}'">
+            <div class="property-card-body">
+                {% if req.interested_in_buddy_up %}
+                <div style="position: absolute; top: 10px; right: 10px; background-color: #3EBFB5; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                    🤝 Buddy Up
+                </div>
+                {% endif %}
+                <h3 class="property-title">
+                    <a href="{% url 'accommodation_request_detail' req.id %}" onclick="event.stopPropagation()">{{ req.title }}</a>
+                </h3>
+                
+                <div class="property-meta">
+                    <span><i class="icon">👤</i> {{ req.student.get_full_name|default:req.student.username }}</span>
+                    <span><i class="icon">📍</i> {{ req.preferred_location }}</span>
+                </div>
+
+                <div class="property-details">
+                    {% if req.accommodation_type %}
+                    <div class="detail-item">
+                        <span class="label">Type:</span>
+                        <span class="value">{{ req.get_accommodation_type_display }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if req.bedrooms_needed %}
+                    <div class="detail-item">
+                        <span class="label">Bedrooms:</span>
+                        <span class="value">{{ req.bedrooms_needed }}</span>
+                    </div>
+                    {% endif %}
+
+                    
+                    {% if req.min_budget and req.max_budget %}
+                    <div class="detail-item">
+                        <span class="label">Budget:</span>
+                        <span class="value">£{{ req.min_budget }} - £{{ req.max_budget }}/month</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if req.move_in_date %}
+                    <div class="detail-item">
+                        <span class="label">Move-in:</span>
+                        <span class="value">{{ req.move_in_date|date:"d M Y" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="property-description">
+                    {{ req.additional_requirements|truncatewords:20 }}
+                </div>
+
+                <div class="property-footer">
+                    <span class="property-date">Posted {{ req.created_at|timesince }} ago</span>
+                    <a href="{% url 'accommodation_request_detail' req.id %}" class="btn-secondary" onclick="event.stopPropagation()">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if requests.has_other_pages %}
+    <div class="pagination">
+        {% if requests.has_previous %}
+        <a href="?page=1" class="page-link">&laquo; First</a>
+        <a href="?page={{ requests.previous_page_number }}" class="page-link">Previous</a>
+        {% endif %}
+
+        <span class="page-current">
+            Page {{ requests.number }} of {{ requests.paginator.num_pages }}
+        </span>
+
+        {% if requests.has_next %}
+        <a href="?page={{ requests.next_page_number }}" class="page-link">Next</a>
+        <a href="?page={{ requests.paginator.num_pages }}" class="page-link">Last &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="no-results">
+        <p>No accommodation requests found.</p>
+        {% if user.is_authenticated %}
+        <a href="{% url 'add_accommodation_request' %}" class="btn-primary">Post Your Requirements</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+# BidNest - Latest Stable Dependencies (SQLite Version)
+# Optimized for SQLite - No PostgreSQL required!
+
+# Core Django
+Django==5.1.5
+
+# Django REST Framework
+djangorestframework==3.15.2
+
+# CORS Headers
+django-cors-headers==4.6.0
+
+# Image Processing
+Pillow==11.1.0
+
+# Environment Variables
+python-decouple==3.8
+
+# Payment Processing
+stripe==11.3.0
+
+# Filtering
+django-filter==24.3
+
+# WebSockets & Real-time (Optional - requires Redis)
+channels==4.2.0
+channels-redis==4.2.1
+daphne==4.1.2
+
+# Background Tasks (Optional - requires Redis)
+celery==5.4.0
+redis==5.2.1
+django-celery-beat==2.8.0
+
+# Authentication & Security
+PyJWT==2.10.1
+
+# HTTP Requests
+requests==2.32.3
+
+# E-Signature
+docusign-esign==6.0.0
+
+# Production Server
+gunicorn==23.0.0
+
+# Static Files
+whitenoise==6.8.2
+
+# Utilities
+python-dateutil==2.9.0
+pytz==2024.2

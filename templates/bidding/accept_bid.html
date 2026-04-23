@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accept Bid{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body" style="padding: 40px; text-align: center;">
+                    <i class="fas fa-check-circle" style="font-size: 60px; color: #27ae60; margin-bottom: 20px;"></i>
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">Accept This Bid?</h3>
+                    
+                    <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; text-align: left;">
+                        <h5 style="color: #2c3e50; margin-bottom: 15px;">{{ bid.property.title }}</h5>
+                        <p style="color: #666; margin-bottom: 10px;"><strong>Student:</strong> {{ bid.student.get_full_name|default:bid.student.username }}</p>
+                        <p style="color: #666; margin-bottom: 10px;"><strong>Email:</strong> {{ bid.student.email }}</p>
+                        <p style="color: #2c3e50; font-size: 24px; font-weight: 600; margin: 15px 0;"><strong>Bid Amount:</strong> £{{ bid.amount }}</p>
+                        {% if bid.message %}
+                            <p style="color: #666; margin-bottom: 0;"><strong>Message:</strong> {{ bid.message }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: left;">
+                        <p style="color: #856404; margin-bottom: 10px; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Important:</p>
+                        <ul style="color: #856404; margin: 0; padding-left: 20px; text-align: left;">
+                            <li>Accepting this bid will update the property's current bid to £{{ bid.amount }}</li>
+                            <li>All other pending bids on this property will be automatically rejected</li>
+                            <li>This action cannot be undone</li>
+                        </ul>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div style="display: flex; gap: 15px;">
+                            <button type="submit" class="btn btn-success" style="flex: 1; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 5px; font-weight: 600; font-size: 16px; cursor: pointer;">
+                                <i class="fas fa-check"></i> Yes, Accept Bid
+                            </button>
+                            <a href="{% url 'bid_detail' bid.id %}" class="btn btn-secondary" style="flex: 1; padding: 12px; background: #6c757d; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

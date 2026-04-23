@@ -1,0 +1,445 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Post Accommodation Seeking Ad - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+<style>
+.step-indicator {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #F5F5F5;
+    border-radius: 8px;
+}
+
+.step-indicator h3 {
+    color: #283A66;
+    margin-bottom: 5px;
+}
+
+.step-indicator p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+.form-section h3 {
+    color: #283A66;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3EBFB5;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.radio-option {
+    flex: 1;
+    min-width: 150px;
+}
+
+.radio-option input[type="radio"] {
+    margin-right: 8px;
+}
+
+.radio-option label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px;
+    border: 2px solid #E0E0E0;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.radio-option input[type="radio"]:checked + label,
+.radio-option label:has(input[type="radio"]:checked) {
+    border-color: #3EBFB5;
+    background: #F0FFFE;
+}
+
+.help-sidebar {
+    background: #F9F9F9;
+    padding: 20px;
+    border-radius: 8px;
+    position: sticky;
+    top: 100px;
+}
+
+.help-sidebar h3 {
+    color: #283A66;
+    margin-bottom: 15px;
+}
+
+.help-sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.help-sidebar li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.help-sidebar li:before {
+    content: "•";
+    color: #3EBFB5;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.help-sidebar a {
+    color: #3EBFB5;
+    text-decoration: none;
+}
+
+.help-sidebar a:hover {
+    text-decoration: underline;
+}
+
+.contact-info {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #E0E0E0;
+}
+
+.contact-info p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="container">
+        <div class="profile-header">
+            <h1>Post an Accommodation Seeking Ad</h1>
+            <p>Let landlords know what you're looking for</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px; max-width: 1200px; margin: 0 auto;">
+            <!-- Main Form -->
+            <div style="background: white; padding: 40px; border-radius: 10px;">
+                <form method="post" class="profile-form">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="form-errors">
+                        {% for error in form.non_field_errors %}
+                        <p class="error-message">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Who's Searching Section -->
+                    <div class="form-section">
+                        <h3>Who's searching?</h3>
+                        <div class="radio-group">
+                            {% for value, label in form.fields.searching_for.choices %}
+                            <div class="radio-option">
+                                <input type="radio" name="searching_for" value="{{ value }}" id="searching_{{ value }}" {% if form.searching_for.value == value %}checked{% endif %} required>
+                                <label for="searching_{{ value }}">{{ label }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.searching_for.errors %}
+                        <span class="field-error">{{ form.searching_for.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Your Gender Section -->
+                    <div class="form-section">
+                        <h3>Your gender(s)</h3>
+                        <div class="radio-group">
+                            {% for value, label in form.fields.gender.choices %}
+                            <div class="radio-option">
+                                <input type="radio" name="gender" value="{{ value }}" id="gender_{{ value }}" {% if form.gender.value == value %}checked{% endif %}>
+                                <label for="gender_{{ value }}">{{ label }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.gender.errors %}
+                        <span class="field-error">{{ form.gender.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Accommodation Type Section -->
+                    <div class="form-section">
+                        <h3>Accommodation type</h3>
+                        <div class="radio-group">
+                            {% for value, label in form.fields.accommodation_type.choices %}
+                            <div class="radio-option">
+                                <input type="radio" name="accommodation_type" value="{{ value }}" id="accommodation_{{ value }}" {% if form.accommodation_type.value == value %}checked{% endif %} onchange="toggleRoomType()">
+                                <label for="accommodation_{{ value }}">{{ label }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.accommodation_type.errors %}
+                        <span class="field-error">{{ form.accommodation_type.errors.0 }}</span>
+                        {% endif %}
+                        
+                        <!-- Room Type (shown only when Room is selected) -->
+                        <div id="roomTypeSection" style="display: none; margin-top: 15px;">
+                            <label>Room Type</label>
+                            <div class="radio-group">
+                                {% for value, label in form.fields.room_type.choices %}
+                                <div class="radio-option">
+                                    <input type="radio" name="room_type" value="{{ value }}" id="room_type_{{ value }}" {% if form.room_type.value == value %}checked{% endif %}>
+                                    <label for="room_type_{{ value }}">{{ label }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.room_type.errors %}
+                            <span class="field-error">{{ form.room_type.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Basic Information -->
+                    <div class="form-section">
+                        <h3>Basic Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.title.id_for_label }}">Ad Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                            <span class="field-error">{{ form.title.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.description.id_for_label }}">Description *</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                            <span class="field-error">{{ form.description.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Location & Preferences -->
+                    <div class="form-section">
+                        <h3>Location & Preferences</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.preferred_location.id_for_label }}">Preferred Location *</label>
+                                {{ form.preferred_location }}
+                                {% if form.preferred_location.errors %}
+                                <span class="field-error">{{ form.preferred_location.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.campus.id_for_label }}">Nearest Campus</label>
+                                {{ form.campus }}
+                                {% if form.campus.errors %}
+                                <span class="field-error">{{ form.campus.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.min_budget.id_for_label }}">Budget Range (Optional)</label>
+                                <div style="display: flex; gap: 10px;">
+                                    {{ form.min_budget }}
+                                    {{ form.max_budget }}
+                                </div>
+                                {% if form.min_budget.errors %}
+                                <span class="field-error">{{ form.min_budget.errors.0 }}</span>
+                                {% endif %}
+                                {% if form.max_budget.errors %}
+                                <span class="field-error">{{ form.max_budget.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.academic_year.id_for_label }}">Academic Year (Optional)</label>
+                                {{ form.academic_year }}
+                                {% if form.academic_year.errors %}
+                                <span class="field-error">{{ form.academic_year.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" id="bedroomsSection" style="display: none;">
+                                <label for="{{ form.bedrooms_needed.id_for_label }}">Bedrooms Needed (Optional)</label>
+                                {{ form.bedrooms_needed }}
+                                {% if form.bedrooms_needed.errors %}
+                                <span class="field-error">{{ form.bedrooms_needed.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.move_in_date.id_for_label }}">Move-in Date (Optional)</label>
+                                {{ form.move_in_date }}
+                                {% if form.move_in_date.errors %}
+                                <span class="field-error">{{ form.move_in_date.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Requirements -->
+                    <div class="form-section">
+                        <h3>Additional Requirements</h3>
+                        
+                        <div class="form-group">
+                            <label>Furnishing Preference</label>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 10px;">
+                                <label class="checkbox-label">
+                                    {{ form.furnishing_furnished }}
+                                    <span>Furnished</span>
+                                </label>
+
+                                <label class="checkbox-label">
+                                    {{ form.furnishing_unfurnished }}
+                                    <span>Unfurnished</span>
+                                </label>
+
+                                <label class="checkbox-label">
+                                    {{ form.furnishing_part_furnished }}
+                                    <span>Part Furnished</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 25px;">
+                            <label style="display: block; margin-bottom: 10px; font-weight: 600;">Amenities</label>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                <label class="checkbox-label">
+                                    {{ form.bills_included_preferred }}
+                                    <span>Bills Included</span>
+                                </label>
+
+                                <label class="checkbox-label">
+                                    {{ form.wifi_required }}
+                                    <span>WiFi</span>
+                                </label>
+
+                                <label class="checkbox-label">
+                                    {{ form.parking_required }}
+                                    <span>Parking</span>
+                                </label>
+
+                                <label class="checkbox-label">
+                                    {{ form.garden_required }}
+                                    <span>Garden</span>
+                                </label>
+
+                                <label class="checkbox-label">
+                                    {{ form.pets_allowed_required }}
+                                    <span>Pets Allowed</span>
+                                </label>
+
+                                <label class="checkbox-label">
+                                    {{ form.disabled_access_required }}
+                                    <span>Disabled Access</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 25px;">
+                            <label for="{{ form.additional_requirements.id_for_label }}">Additional Requirements (Optional)</label>
+                            {{ form.additional_requirements }}
+                            {% if form.additional_requirements.errors %}
+                            <span class="field-error">{{ form.additional_requirements.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Buddy Ups Section -->
+                    <div class="form-section">
+                        <h3>Buddy ups</h3>
+                        <div style="background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #3EBFB5;">
+                            <label class="checkbox-label" style="display: flex; align-items: flex-start; cursor: pointer;">
+                                {{ form.interested_in_buddy_up }}
+                                <div style="margin-left: 10px;">
+                                    <span style="font-weight: 600; display: block; margin-bottom: 5px;">{{ form.interested_in_buddy_up.label }}</span>
+                                    <span style="color: #666; font-size: 14px; display: block;">
+                                        {{ form.interested_in_buddy_up.help_text }}
+                                    </span>
+                                </div>
+                            </label>
+                            {% if form.interested_in_buddy_up.errors %}
+                            <span class="field-error">{{ form.interested_in_buddy_up.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                        {% if user.is_authenticated %}
+                        <button type="submit" class="btn-save-profile">Post Ad</button>
+                        <a href="{% url 'home' %}" class="btn-save-profile" style="background: #6C757D; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Cancel</a>
+                        {% else %}
+                        <a href="{% url 'login' %}?next={% url 'add_accommodation_request' %}" class="btn-save-profile" style="text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Sign In to Post Ad</a>
+                        <a href="{% url 'register' %}?next={% url 'add_accommodation_request' %}" class="btn-save-profile" style="background: #3EBFB5; text-align: center; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Sign Up to Post Ad</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Help Sidebar -->
+            <div class="help-sidebar">
+                <h3>Help topics</h3>
+                <ul>
+                    <li><a href="#">What's a buddy up?</a></li>
+                    <li><a href="#">What's the difference between a single and double room?</a></li>
+                    <li><a href="#">How to write a good ad?</a></li>
+                </ul>
+
+                <div class="contact-info">
+                    <h3>Need any help?</h3>
+                    <p>Contact us by email or</p>
+                    <p style="color: #3EBFB5; font-weight: 600;">📞 Call us on 0123 456 7890</p>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 10px;">Mon to Fri: 9am – 8.30pm<br>Weekends: 10am – 7.30pm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle room type section based on accommodation type
+function toggleRoomType() {
+    const accommodationType = document.querySelector('input[name="accommodation_type"]:checked');
+    const roomTypeSection = document.getElementById('roomTypeSection');
+    const bedroomsSection = document.getElementById('bedroomsSection');
+    
+    if (accommodationType && accommodationType.value === 'room') {
+        roomTypeSection.style.display = 'block';
+        bedroomsSection.style.display = 'none';
+    } else if (accommodationType && accommodationType.value === 'whole') {
+        roomTypeSection.style.display = 'none';
+        bedroomsSection.style.display = 'block';
+    } else {
+        roomTypeSection.style.display = 'none';
+        bedroomsSection.style.display = 'none';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleRoomType();
+    
+    // Add event listeners to accommodation type radio buttons
+    const accommodationRadios = document.querySelectorAll('input[name="accommodation_type"]');
+    accommodationRadios.forEach(radio => {
+        radio.addEventListener('change', toggleRoomType);
+    });
+});
+</script>
+{% endblock %}

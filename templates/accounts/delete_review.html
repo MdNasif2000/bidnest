@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Review{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body" style="padding: 40px; text-align: center;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 60px; color: #e74c3c; margin-bottom: 20px;"></i>
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">Delete Review?</h3>
+                    
+                    <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; text-align: left;">
+                        <p style="color: #666; margin-bottom: 10px;"><strong>Landlord:</strong> {{ review.landlord.get_full_name|default:review.landlord.username }}</p>
+                        <p style="color: #666; margin-bottom: 10px;"><strong>Rating:</strong> {{ review.rating }}★</p>
+                        <p style="color: #666; margin-bottom: 0;"><strong>Comment:</strong> {{ review.comment|truncatewords:30 }}</p>
+                    </div>
+
+                    <p style="color: #666; margin-bottom: 30px;">Are you sure you want to delete this review? This action cannot be undone.</p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div style="display: flex; gap: 15px;">
+                            <button type="submit" class="btn btn-danger" style="flex: 1; padding: 12px; font-size: 16px;">
+                                <i class="fas fa-trash"></i> Yes, Delete Review
+                            </button>
+                            <a href="{% url 'landlord_detail' review.landlord.id %}" class="btn btn-secondary" style="flex: 1; padding: 12px; font-size: 16px; text-align: center; text-decoration: none; color: white;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

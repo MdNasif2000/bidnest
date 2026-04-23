@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Property Images - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="container">
+        <div class="profile-header">
+            <h1>Add Property Images</h1>
+            <p>Upload photos of {{ property.title }}</p>
+        </div>
+
+        <div style="max-width: 900px; margin: 0 auto;">
+            <!-- Upload Form -->
+            <div style="background: white; padding: 40px; border-radius: 10px; margin-bottom: 30px;">
+                <form method="post" enctype="multipart/form-data" class="profile-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.image.id_for_label }}">Select Image *</label>
+                        {{ form.image }}
+                        <small class="help-text">Upload high-quality images (JPG, PNG). Recommended size: 1200x800px</small>
+                        {% if form.image.errors %}
+                        <span class="field-error">{{ form.image.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.caption.id_for_label }}">Caption (Optional)</label>
+                        {{ form.caption }}
+                        {% if form.caption.errors %}
+                        <span class="field-error">{{ form.caption.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn-save-profile">Upload Image</button>
+                </form>
+            </div>
+
+            <!-- Uploaded Images -->
+            {% if images %}
+            <div style="background: white; padding: 40px; border-radius: 10px; margin-bottom: 30px;">
+                <h3 style="margin-bottom: 20px; color: #283A66;">Uploaded Images ({{ images.count }})</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+                    {% for image in images %}
+                    <div style="position: relative; border-radius: 8px; overflow: hidden; border: 2px solid #E0E0E0;">
+                        <img src="{{ image.image.url }}" alt="{{ image.caption }}" style="width: 100%; height: 200px; object-fit: cover;">
+                        {% if image.caption %}
+                        <div style="padding: 10px; background: #F5F5F5; font-size: 0.85rem; color: #666;">
+                            {{ image.caption }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div style="background: white; padding: 30px; border-radius: 10px; text-align: center;">
+                {% if images %}
+                <p style="color: #666; margin-bottom: 20px;">You've uploaded {{ images.count }} image{{ images.count|pluralize }}. You can add more or finish.</p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="{% url 'property_detail' property.id %}" style="padding: 12px 30px; background: #3EBFB5; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">
+                        View Property
+                    </a>
+                    <a href="{% url 'edit_property' property.id %}" style="padding: 12px 30px; background: white; color: #283A66; border: 2px solid #283A66; text-decoration: none; border-radius: 5px; font-weight: 600;">
+                        Edit Details
+                    </a>
+                    <a href="{% url 'landlord_dashboard' %}" style="padding: 12px 30px; background: #283A66; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">
+                        Finish & Go to Dashboard
+                    </a>
+                </div>
+                {% else %}
+                <p style="color: #999; margin-bottom: 20px;">No images uploaded yet. Add at least one image to showcase your property.</p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <a href="{% url 'landlord_dashboard' %}" style="padding: 12px 30px; background: #666; color: white; text-decoration: none; border-radius: 5px; font-weight: 600; display: inline-block;">
+                        Skip & Finish Later
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
