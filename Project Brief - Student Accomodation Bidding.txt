@@ -1,207 +1,0 @@
-COM367 Professional Practice
-Computing Consultancy Project Brief
-This assessment contributes to 100% of the overall module mark
-Release date: 22nd September 2025
-Submission Deadline: June 2026 (TBC)
-
-Submission Instructions
-Your report should be submitted as a PDF along with your presentation ppt file as an appendix to Blackboard by the deadline. The report should consist of 10-15 pages (or 3000 words, including graphics, etc., but script file/s do NOT count towards the word limit), font size should be 12, line spacing 1.5 lines. Referencing should be in Harvard Format.
-
-Project Brief
-Company Name: BidNest - Student Accommodation Renting & Bidding Platform 
-- "Where Every Bid Counts"
-Online Presence: To be developed (Web Based)
-
-Background
-
-Finding suitable accommodation is one of the biggest challenges faced by students in the UK. While there are websites for general rental listings, there is currently no dedicated platform where students can bid for accommodations, post their requirements, or negotiate directly with landlords in a secure and transparent environment.
-BidNest aims to address these gaps by providing a web-based marketplace specifically designed for student accommodation. The platform will integrate bidding, secure payments, direct communication, and digital documentation, ensuring that both students and landlords can manage the entire accommodation process from start to finish in one place.
-
-Key features include:
-> Bidding on preferred properties.
-> Posting detailed accommodation requirements.
-> Direct messaging between students and landlords.
-> Secure payment using an escrow system.
-> Online contract creation, signing, and document verification for legal transparency.
-> Automated notifications for contract expiry or renewal.
-BidNest will initially be developed as a web platform, with a potential mobile version in future phases.
-
-Problem Statement
-Students often face difficulties such as:
-> Limited visibility of suitable accommodations.
-> Difficulty finding affordable, student-friendly housing close to their university.
-> Lack of transparency in pricing and property availability.
-> No bidding or negotiation system in existing UK platforms.
-> Unclear or insecure payment methods.
-> Manual, time-consuming document and agreement handling.
-
-Landlords face challenges including:
-> Difficulty reaching verified student tenants.
-> Managing multiple offers and inquiries efficiently.
-> Lack of secure and timely payment options.
-> Manual handling of tenancy agreements and identity verification.
-
-There is a clear need for a dedicated, student-oriented online platform that streamlines every stage of the accommodation process — from search and negotiation to contract signing and payment — while ensuring security, convenience, and transparency for both parties.
-
-Tasks / Functional Requirements
-The consultancy work for this web-based platform will involve:
-Website Features
-User Roles: Students(user), Landlords(user), and Admin.
-Users:
-Student Functionality:
-> Create and manage personal profiles.
-> Browse and search accommodation listings.
-> Place bids on desired properties.
-> Post accommodation requirements for landlords to respond to.
-> Direct messaging with landlords.
-> Secure payments through an escrow system.
-> Upload and manage verification documents (e.g., ID, proof of study).
-> Review and digitally sign tenancy agreements online.
-> Receive automated notifications for contract status and expiry.
-> Track bid history, negotiations, and payment progress.
-> Give ratings and reviews to landlords after tenancy completion.
-
-Landlord Functionality:
-> Create and manage property listings.
-> Receive bids from students and view negotiation history.
-> Communicate directly with students via in-platform messaging.
-> Accept or reject offers and finalize agreements.
-> Request necessary documents from tenants (ID, guarantor forms, etc.).
-> Generate and sign digital tenancy contracts within the platform.
-> Manage secure payments and escrow release.
-> View contract dashboard (active, pending, expired).
-> Receive notifications for upcoming contract expiries or renewals.
-
-
-Admin Functionality:
-> Approve and monitor all student and landlord accounts.
-> Oversee property listings, bids, and payments.
-> Manage disputes or reported activities.
-> Monitor message activity for compliance and safety.
-> Manage digital contracts and verify uploaded documents.
-> Generate system analytics and reports on user activity, bidding trends, and transaction flow.
-> Configure and manage notification systems.
-> Maintain website content and handle updates.
-
-Digital Contract & Document Verification System 
-The platform will include a built-in digital contract system that ensures all agreements between students and landlords are legally binding, verifiable, and securely stored.
-Key Capabilities:
-Document Upload & Verification:
-> Tenants and landlords can upload required documents (e.g., IDs, proof of study, property ownership).
-> The system may integrate third-party verification APIs for authenticity checks.
-
-Contract Generation & E-Signature:
-> Once a bid is accepted, a digital tenancy contract will be automatically generated from a customizable template.
-> Both parties can digitally sign via an integrated e-signature service (e.g.,DocuSign or HelloSign).
-Contract Management Dashboard:
-> Users can view and download active, pending, or expired contracts.
-Automated Notifications:
-> Push and email alerts will be sent to both parties:
-> 30 days before contract expiry.
-> 7 days before expiry.
-> On the expiry date.
-
-Renewal Option:
-> Tenants and landlords can agree to renew contracts online, triggering a new signing cycle.
-
-Website Design & Development:
-> Design a modern, intuitive, and student-friendly interface.
-> Identify appropriate WordPress templates or develop a custom framework.
-> Implement interactive components such as bidding modules, messaging, and document upload portals.
-> Ensure robust security including HTTPS encryption, anti-spam, and escrow safety.
-> Implement database structures to handle digital contracts, document storage, and version control.
-> Conduct usability testing to ensure smooth user experience.
-> Optimize for SEO and cross-browser compatibility (Chrome, Safari, Edge, Firefox).
-
-Analytics & Reporting:
-> Track user behaviour, bid activity, and transaction data.
-> Record contract activity and document verification history.
-> Generate regular analytical reports for admin and system improvement.
-
-Deliverables:
-> Fully functional web-based student accommodation bidding platform.
-> Integrated digital contract and verification system.
-> Secure payment and escrow management module.
-> Tested, optimized, and ready-to-launch platform.
-
-Work Related Project Process
-Typically, a work-related project would involve going through the software development life cycle as indicated below:
-1. Project Management
-Apply a project management methodology in planning, development, management and execution of the project. Deliverables include, but are not limited to, documents such as project plan, cost-benefit analysis, Gantt chart, Work Breakdown Structure, Risk Assessment.
-
-2. Software Engineering
-The following stages of the software development lifecycle will generally be required to develop the system, although this could be altered depending on the software methodology being used.
-* Feasibility Study – Technical feasibility and schedule feasibility will be evaluated at this stage in order to be certain about what the project entails.
-* Requirements gathering – This will involve using techniques such as interviews or questionnaires or focus groups as well as user stories to understand the problem. 
-* Requirements Analysis/Specification – This involves analysing the requirements from a technical point of view and specifying the functional and non-functional requirements.
-* Design – This stage will involve creating high-level and low-level representations of the system in the form of diagrams (e.g. UML) showing the architecture and design of the system.
-* Implementation (Coding) – This stage will involve using a programming language to develop the system.
-* Testing – This stage will involve carrying out various tests on the system such as unit testing, User acceptance testing, black-box testing etc. to ensure that the system is fit for use.
-* Configuration and Deployment – This will involve deployment of the system for the client to use.
-
-Benchmarks
-In addition to the above specification points, you are required to do the following:
-* Critical Evaluation of Performance
-Critically evaluate your performance throughout the project highlighting your strengths and limitations and also reflecting on the project management process and the challenges encountered and how they were resolved. Your evaluation should also include lessons learned from executing the project and areas of improvement.
-
-* Critical Reflection on Personal Development and Career goals
-Critically reflect on your personal development goals, mapping them where applicable with national and international career opportunities. Also highlight any learning opportunities that may be useful for you.
-
-
-
-Keeping Journals
-You are required to maintain a Placement Journal which should be completed regularly (weekly) online in Recruit. The Placement Journal provides a record of the experiences that you have gained and the learning that you have achieved. It will be a valuable resource for you in the preparation of your Placement Report.
-It will be inspected by your Academic Visitor at, or prior to, each visit, and by the assessor of your Placement Report. Your journal will be used as an evidence source to corroborate:
-* your achievement of the Placement Competencies
-* claims that you make in your Placement Report
-Failure to maintain a satisfactory journal may therefore impair your performance in these components of your assessment.
-As this is a record of your work and learning experience, it should include
-* notes and observations on the work you have done
-* reflections on the skills, knowledge, understanding and experience you have acquired
-Your journal should include details of all aspects of the placement including, but not necessarily limited to, the following:
-* technical issues
-* business issues
-* social, legal & ethical issues
-* industrial relations
-* management practices
-You are advised to ensure that details of a technical nature comply with the organisation's policy and practice on confidentiality; company material may only be included if explicit permission has been given.      
-
-
-WeightingAchievement Area0-39% (Fail)40-59% (Pass)60-69% (Commendation)70-100% (Distinction)20%Presentation & communicationSubmission instructions not followed.
-Frequent spelling, punctuation and/or grammatical errors that obscure the intended meaning.
-Lack – or inappropriate use – of tables, diagrams and/or images.Some presentation issues but intended meaning is mostly clear.Appropriate writing style, with good spelling, punctuation & grammar.
-Report organised and readable. Table of contents included and reference list in Harvard style.
-Appropriate use of tables and figures – numbered and labelled.Commendation criteria clearly satisfied/surpassed, plus:
-* Report is interesting and engaging.
-* Thoughts logically organised & clearly expressed, with an appropriate level of detail.
-* Effective and consistent use of formatting & layout, including: paragraphs, lists, tables, typeface, etc.
-* No significant spelling, punctuation or grammatical errors.30%Knowledge of organisation and 
-own roleLittle or no detail on the organisation’s history or management structure.
-Little or no understanding of the organisation’s core business, or who its customers/clients are.
-Account of own role is unclear or lacking in detail.Good knowledge of the organisation’s management structure and core business.
-Clear account of own role within the organisation.Clear account of organisation’s management structure.
-Clear account of organisation’s core business and the needs of its clients/customers.
-Clear account of own role and management/supervision arrangements.Commendation criteria clearly satisfied/surpassed, plus:
-* Clearly articulated understanding of the organisation as a whole, including how each functional unit supports the core business.
-* Clearly articulated understanding of the significance of own role in contributing to organisation’s core business.
-* Clearly articulated understanding of how own role interdepends with those colleagues.50%Reflection & EvaluationLittle or no evidence of reflection.
-Little or no evidence that student has taken advantage of learning opportunities.Evidence of reflection on most aspects of the placement experience.
-Some awareness of how placement has contributed to own employability.Evidence of reflective engagement with the placement competencies.
-Evidence of reflection on own learning, and appropriate engagement with available learning opportunities.
-Awareness of own personal & professional development and of how this relates to employability in the graduate job market.Commendation criteria clearly satisfied/surpassed, plus:
-* Clearly articulated evidence of thoughtful reflection on all aspects of the placement experience.
-* Clearly articulated evidence of reflection on own learning, including, where appropriate, actively seeking learning opportunities.
-* Awareness of own value and effectiveness as an employee, and of the factors that have contributed to this.
-* Awareness of a range of career options, reflecting appropriate knowledge of the graduate job market.
-
-
-Placement Competencies
-CompetencyAchieved 
-Y / NAction 
-Indicate further any action needed to achieve competency.1IndependenceStudent demonstrates appropriate independence and self-reliance in carrying out their duties.  This might include making appropriate use of sources help and support.In progress2FlexibilityStudent demonstrates appropriate flexibility in carrying out their duties. This might include transitioning from student life; responding appropriately to changing needs, work patterns, deadlines, etc.3TimekeepingStudent has an appropriate and satisfactory record of attendance and timekeeping.4TeamworkStudent is an effective team member and has good working relationships with colleagues/clients/customers.5Interpersonal SkillsStudent demonstrates effective communication & interpersonal skills. This might include: speaking, listening, presenting, writing, use of telephone & email, informing, instructing, training, persuading, demonstrating, etc.6Self-awarenessStudent has appropriate awareness of the extent and limits of their own professional competence. This might include: taking appropriate initiative, asking for help, identifying training needs, responding appropriately to performance feedback, etc.7Organisation & planningStudent demonstrates effective planning in managing tasks. This might include seeing tasks through to their conclusion, making effective use of own time, avoiding unnecessary work, etc.8Health & Safety AwarenessStudent is aware of relevant health & safety issues and, where necessary, adopts appropriate work practices.  9Social & Professional AwarenessStudent is aware of relevant professional social, legal & ethical issues and responsibilities. This might include awareness of: relevant legislation, impact of organisation’s actions on people and the environment, organisation’s policy on social responsibility, professional body codes, etc.10Technical ExpertiseStudent demonstrates appropriate expertise in the use of technology appropriate to the job and their course of study.
-
-
-
-
-
-
