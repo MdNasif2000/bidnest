@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Respond to Review{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body" style="padding: 30px;">
+                    <h2 style="color: #2c3e50; margin-bottom: 20px;">Respond to Review</h2>
+                    
+                    <!-- Original Review -->
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong style="color: #2c3e50;">{{ review.student.get_full_name|default:review.student.username }}</strong>
+                            <span style="color: #FFD700; font-size: 18px;">{{ review.rating }}★</span>
+                        </div>
+                        <p style="color: #666; margin: 0;">{{ review.comment }}</p>
+                        <p style="color: #999; font-size: 13px; margin-top: 10px; margin-bottom: 0;">{{ review.created_at|date:"d M Y" }}</p>
+                    </div>
+
+                    <!-- Response Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label for="response" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">Your Response</label>
+                            <textarea name="response" id="response" rows="5" class="form-control" placeholder="Thank you for your feedback..." required>{% if review.landlord_response %}{{ review.landlord_response }}{% endif %}</textarea>
+                            <small style="color: #666; display: block; margin-top: 5px;">Be professional and constructive in your response.</small>
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px; font-size: 16px;">
+                                <i class="fas fa-reply"></i> Post Response
+                            </button>
+                            <a href="{% url 'landlord_dashboard' %}" class="btn btn-secondary" style="flex: 1; padding: 12px; font-size: 16px; text-align: center; text-decoration: none; color: white;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 15px;
+        font-family: inherit;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if is_edit %}Edit{% else %}Add{% endif %} Review{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body" style="padding: 30px;">
+                    <h2 style="color: #2c3e50; margin-bottom: 20px;">
+                        {% if is_edit %}Edit Your Review{% else %}Leave a Review{% endif %}
+                    </h2>
+                    
+                    <!-- Landlord Info -->
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                        <h5 style="color: #2c3e50; margin-bottom: 10px;">{{ landlord.get_full_name|default:landlord.username }}</h5>
+                        <p style="color: #666; margin: 0;">Landlord</p>
+                    </div>
+
+                    <!-- Review Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="{{ form.rating.id_for_label }}" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">Rating</label>
+                            <div class="star-rating">
+                                {% for value in "12345" %}
+                                <input type="radio" name="rating" id="star{{ value }}" value="{{ value }}" {% if form.rating.value == value|stringformat:"s" %}checked{% endif %} required>
+                                <label for="star{{ value }}">★</label>
+                                {% endfor %}
+                            </div>
+                            {% if form.rating.errors %}
+                                <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ form.rating.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label for="{{ form.comment.id_for_label }}" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">Your Review</label>
+                            {{ form.comment }}
+                            {% if form.comment.errors %}
+                                <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">{{ form.comment.errors }}</div>
+                            {% endif %}
+                            <small style="color: #666; display: block; margin-top: 5px;">Share your experience with this landlord.</small>
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button type="submit" class="btn btn-primary" style="flex: 1; padding: 12px; font-size: 16px;">
+                                <i class="fas fa-check"></i> {% if is_edit %}Update Review{% else %}Submit Review{% endif %}
+                            </button>
+                            <a href="{% url 'landlord_detail' landlord.id %}" class="btn btn-secondary" style="flex: 1; padding: 12px; font-size: 16px; text-align: center; text-decoration: none; color: white;">
+                                Cancel
+                            </a>
+                        </div>
+                        
+                        {% if is_edit %}
+                        <div style="margin-top: 20px; text-align: center;">
+                            <a href="{% url 'delete_review' review.id %}" style="color: #e74c3c; text-decoration: none; font-size: 14px;">
+                                <i class="fas fa-trash"></i> Delete Review
+                            </a>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 15px;
+        font-family: inherit;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+    
+    /* Star Rating */
+    .star-rating {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        font-size: 40px;
+    }
+    
+    .star-rating input[type="radio"] {
+        display: none;
+    }
+    
+    .star-rating label {
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+        user-select: none;
+    }
+    
+    .star-rating label.active {
+        color: #FFD700;
+    }
+    
+    .star-rating label:hover {
+        color: #FFD700;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const starRating = document.querySelector('.star-rating');
+    const stars = starRating.querySelectorAll('label');
+    const inputs = starRating.querySelectorAll('input[type="radio"]');
+    
+    // Function to update star display
+    function updateStars(rating) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    }
+    
+    // Check if there's a pre-selected value
+    inputs.forEach((input, index) => {
+        if (input.checked) {
+            updateStars(parseInt(input.value));
+        }
+    });
+    
+    // Add click handlers
+    stars.forEach((star, index) => {
+        star.addEventListener('click', function() {
+            const rating = index + 1;
+            inputs[index].checked = true;
+            updateStars(rating);
+        });
+        
+        star.addEventListener('mouseenter', function() {
+            const rating = index + 1;
+            updateStars(rating);
+        });
+    });
+    
+    // Reset to selected value on mouse leave
+    starRating.addEventListener('mouseleave', function() {
+        let selectedRating = 0;
+        inputs.forEach((input, index) => {
+            if (input.checked) {
+                selectedRating = parseInt(input.value);
+            }
+        });
+        updateStars(selectedRating);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Conversation - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messaging.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="delete-conversation-container">
+    <div class="delete-conversation-card">
+        <div class="delete-conversation-header">
+            <div class="delete-conversation-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2>Delete Conversation?</h2>
+            <p>This action cannot be undone.</p>
+        </div>
+
+        <div class="delete-conversation-info">
+            <p>
+                <strong>Conversation with:</strong>
+                {% if user == conversation.student %}
+                    {{ conversation.landlord.get_full_name|default:conversation.landlord.username }}
+                {% else %}
+                    {{ conversation.student.get_full_name|default:conversation.student.username }}
+                {% endif %}
+            </p>
+            <p class="delete-conversation-warning">
+                All messages in this conversation will be permanently deleted.
+            </p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-conversation-actions">
+                <button type="submit" class="delete-conversation-btn">
+                    <i class="fas fa-trash"></i> Delete Conversation
+                </button>
+                <a href="{% url 'conversation_detail' conversation.id %}" class="delete-conversation-cancel">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

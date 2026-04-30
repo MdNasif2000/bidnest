@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BidNest - Where Every Bid Counts{% endblock %}</title>
+    {% load static %}
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo">
+                        <a href="{% url 'home' %}">
+                            <img src="{% static 'images/logo.png' %}?v={{ request.GET.v|default:'3' }}" alt="BidNest Logo" style="height: 60px;">
+                        </a>
+                    </div>
+                    
+                    <nav class="main-nav">
+                        {% if user.is_authenticated %}
+                            {% if user.user_type == 'student' %}
+                                <a href="{% url 'home' %}">Home</a>
+                                <a href="{% url 'property_list' %}">Search</a>
+                                <a href="{% url 'accommodation_requests' %}">Seeking Ads</a>
+                                <div class="nav-dropdown">
+                                    <a href="#" class="nav-dropdown-btn">Post Ad</a>
+                                    <div class="nav-dropdown-menu">
+                                        <a href="{% url 'add_accommodation_request' %}">Accommodation Seeking Ad</a>
+                                        <a href="{% url 'register' %}?type=landlord">Property Rent Ad</a>
+                                    </div>
+                                </div>
+                                <a href="{% url 'my_bids' %}">My Bids</a>
+                                <a href="{% url 'saved_properties' %}">Saved</a>
+                                <a href="{% url 'inbox' %}" style="position: relative;">
+                                    Messages
+                                    <span class="message-badge" id="message-count" style="display: none;"></span>
+                                </a>
+                                <a href="{% url 'my_contracts' %}">Contracts</a>
+                            {% elif user.user_type == 'landlord' %}
+                                <a href="{% url 'home' %}">Home</a>
+                                <a href="{% url 'property_list' %}">Search</a>
+                                <a href="{% url 'accommodation_requests' %}">Seeking Ads</a>
+                                <div class="nav-dropdown">
+                                    <a href="#" class="nav-dropdown-btn">Post Ad</a>
+                                    <div class="nav-dropdown-menu">
+                                        <a href="{% url 'add_accommodation_request' %}">Accommodation Seeking Ad</a>
+                                        <a href="{% url 'add_property' %}">Property Rent Ad</a>
+                                    </div>
+                                </div>
+                                <a href="{% url 'landlord_dashboard' %}">Dashboard</a>
+                                <a href="{% url 'received_bids' %}">Bids</a>
+                                <a href="{% url 'inbox' %}" style="position: relative;">
+                                    Messages
+                                    <span class="message-badge" id="message-count" style="display: none;"></span>
+                                </a>
+                                <a href="{% url 'my_contracts' %}">Contracts</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'home' %}">Home</a>
+                            <a href="{% url 'property_list' %}">Search</a>
+                            <a href="{% url 'accommodation_requests' %}">Seeking Ads</a>
+                            <div class="nav-dropdown">
+                                <a href="#" class="nav-dropdown-btn">Post Ad</a>
+                                <div class="nav-dropdown-menu">
+                                    <a href="{% url 'add_accommodation_request' %}">Accommodation Seeking Ad</a>
+                                    <a href="{% url 'register' %}?type=landlord&next={% url 'add_property' %}">Property Rent Ad</a>
+                                </div>
+                            </div>
+                            <a href="{% url 'home' %}#how-it-works">How it Works ?</a>
+                            <a href="{% url 'contact' %}">Help ?</a>
+                        {% endif %}
+                    </nav>
+                </div>
+                
+                <div class="header-right">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'notifications_list' %}" class="notification-link">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <span class="notification-badge" id="notification-count"></span>
+                        </a>
+                        <div class="user-profile-dropdown">
+                            <button class="user-profile-btn" id="userProfileBtn">
+                                <div class="user-avatar">
+                                    {% if user.profile_picture %}
+                                    <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
+                                    {% else %}
+                                    <img src="{% static 'images/user-default-icon.png' %}" alt="User">
+                                    {% endif %}
+                                </div>
+                                <div class="user-info">
+                                    <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                                    <span class="user-role">{{ user.user_type|title }}</span>
+                                </div>
+                                <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                            <div class="user-dropdown-menu" id="userDropdownMenu">
+                                <div class="dropdown-header">
+                                    <div class="dropdown-avatar">
+                                        {% if user.profile_picture %}
+                                        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
+                                        {% else %}
+                                        <img src="{% static 'images/user-default-icon.png' %}" alt="User">
+                                        {% endif %}
+                                    </div>
+                                    <div class="dropdown-user-info">
+                                        <strong>{{ user.get_full_name|default:user.username }}</strong>
+                                        <span>{{ user.email }}</span>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a href="{% if user.user_type == 'student' %}{% url 'student_profile' %}{% else %}{% url 'landlord_profile' %}{% endif %}" class="dropdown-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    My Profile
+                                </a>
+                                {% if user.user_type == 'landlord' %}
+                                <a href="{% url 'landlord_dashboard' %}" class="dropdown-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="3" width="7" height="7"></rect>
+                                        <rect x="14" y="14" width="7" height="7"></rect>
+                                        <rect x="3" y="14" width="7" height="7"></rect>
+                                    </svg>
+                                    Dashboard
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'my_contracts' %}" class="dropdown-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                    My Contracts
+                                </a>
+                                <a href="{% url 'inbox' %}" class="dropdown-item" style="position: relative;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                    Messages
+                                    <span class="message-badge-dropdown" id="message-count-dropdown" style="display: none;"></span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{% url 'logout' %}" class="dropdown-item logout-item">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="auth-buttons">
+                            <a href="{% url 'login' %}" class="btn-signin-header">Sign In</a><a href="{% url 'register' %}" class="btn-signup-header">Sign Up</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="django-messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            <button class="close-alert">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <a href="{% url 'home' %}">
+                        <img src="{% static 'images/logo.png' %}?v=2" alt="BidNest" style="height: 60px;">
+                    </a>
+                    <p>Where Every Bid Counts</p>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Quick Links</h4>
+                        <a href="{% url 'about' %}">About Us</a>
+                        <a href="{% url 'contact' %}">Contact Us</a>
+                        <a href="{% url 'privacy' %}">Privacy Policy</a>
+                        <a href="{% url 'terms' %}">Terms & Conditions</a>
+                    </div>
+                </div>
+                
+                <div class="footer-social">
+                    <a href="#" aria-label="Facebook">
+                        <img src="{% static 'images/facebook-icon.png' %}" alt="Facebook" style="width: 24px; height: 24px;">
+                    </a>
+                    <a href="#" aria-label="LinkedIn">
+                        <img src="{% static 'images/linkedin-icon.png' %}" alt="LinkedIn" style="width: 24px; height: 24px;">
+                    </a>
+                    <a href="#" aria-label="Twitter">
+                        <img src="{% static 'images/twitter-icon.png' %}" alt="Twitter" style="width: 24px; height: 24px;">
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>Copyright © 2025 | All Rights Reserved by BidNest</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}?v=2"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

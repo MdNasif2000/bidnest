@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Generate Contract{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px; max-width: 900px; margin: 0 auto;">
+    <div class="card shadow-sm">
+        <div class="card-body" style="padding: 40px;">
+            <h2 style="color: #2c3e50; margin-bottom: 10px;">Generate Contract</h2>
+            <p style="color: #666; margin-bottom: 30px;">Create a tenancy agreement for the accepted bid</p>
+            
+            <!-- Bid Summary -->
+            <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px;">
+                <h4 style="color: #2c3e50; margin-bottom: 15px;">Bid Details</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div>
+                        <strong style="color: #666; font-size: 14px;">Property:</strong>
+                        <p style="margin: 5px 0 0 0; color: #2c3e50;">{{ bid.property.title }}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666; font-size: 14px;">Student:</strong>
+                        <p style="margin: 5px 0 0 0; color: #2c3e50;">{{ bid.student.get_full_name|default:bid.student.username }}</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666; font-size: 14px;">Agreed Rent:</strong>
+                        <p style="margin: 5px 0 0 0; color: #3EBFB5; font-size: 18px; font-weight: 700;">£{{ bid.amount }}/month</p>
+                    </div>
+                    <div>
+                        <strong style="color: #666; font-size: 14px;">Deposit:</strong>
+                        <p style="margin: 5px 0 0 0; color: #2c3e50; font-size: 18px; font-weight: 700;">£{{ bid.property.deposit }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contract Form -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label for="start_date" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px; display: block;">Tenancy Start Date</label>
+                    <input type="date" name="start_date" id="start_date" class="form-control" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 15px;">
+                    <small style="color: #666; display: block; margin-top: 5px;">When the tenancy will begin</small>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label for="end_date" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px; display: block;">Tenancy End Date</label>
+                    <input type="date" name="end_date" id="end_date" class="form-control" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 15px;">
+                    <small style="color: #666; display: block; margin-top: 5px;">When the tenancy will end (typically 6-12 months)</small>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label for="terms_and_conditions" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px; display: block;">Terms and Conditions</label>
+                    <textarea name="terms_and_conditions" id="terms_and_conditions" rows="15" class="form-control" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; font-family: monospace;">{{ default_terms }}</textarea>
+                    <small style="color: #666; display: block; margin-top: 5px;">Standard tenancy agreement terms (you can modify as needed)</small>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 30px;">
+                    <label for="special_conditions" style="font-weight: 600; color: #2c3e50; margin-bottom: 8px; display: block;">Special Conditions (Optional)</label>
+                    <textarea name="special_conditions" id="special_conditions" rows="5" class="form-control" placeholder="Any additional terms or conditions specific to this tenancy..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 15px;"></textarea>
+                    <small style="color: #666; display: block; margin-top: 5px;">Add any property-specific terms or agreements</small>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1; padding: 14px; background: #3EBFB5; color: white; border: none; border-radius: 5px; font-weight: 600; font-size: 16px; cursor: pointer;">
+                        <i class="fas fa-file-contract"></i> Generate Contract
+                    </button>
+                    <a href="{% url 'received_bids' %}" class="btn btn-secondary" style="flex: 1; padding: 14px; background: #6c757d; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 16px;">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        outline: none;
+        border-color: #3EBFB5;
+        box-shadow: 0 0 0 3px rgba(62, 191, 181, 0.1);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    
+    // Set minimum date for start date to today
+    const today = new Date().toISOString().split('T')[0];
+    startDateInput.setAttribute('min', today);
+    
+    // Update end date minimum when start date changes
+    startDateInput.addEventListener('change', function() {
+        const startDate = this.value;
+        if (startDate) {
+            // Set end date minimum to one day after start date
+            const minEndDate = new Date(startDate);
+            minEndDate.setDate(minEndDate.getDate() + 1);
+            endDateInput.setAttribute('min', minEndDate.toISOString().split('T')[0]);
+            
+            // If end date is already set and is before new start date, clear it
+            if (endDateInput.value && endDateInput.value <= startDate) {
+                endDateInput.value = '';
+                alert('End date must be after start date. Please select a new end date.');
+            }
+        }
+    });
+    
+    // Validate on form submit
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        
+        if (startDate && endDate && endDate <= startDate) {
+            e.preventDefault();
+            alert('End date must be after start date.');
+            endDateInput.focus();
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

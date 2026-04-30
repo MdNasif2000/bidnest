@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bids{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/bidding.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <h2 style="color: #2c3e50; margin-bottom: 30px;">My Bids</h2>
+
+    {% if bids %}
+        <div class="bids-container">
+            {% for bid in bids %}
+            <div class="bid-card">
+                <div class="bid-card-content">
+                    <!-- Property Image -->
+                    <div class="bid-image">
+                        {% if bid.property.images.first %}
+                            <img src="{{ bid.property.images.first.image.url }}" alt="{{ bid.property.title }}">
+                        {% else %}
+                            <img src="{% static 'images/property.jpg' %}" alt="Property">
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Property Info -->
+                    <div class="bid-info">
+                        <div class="bid-header">
+                            <h4 class="bid-title">
+                                <a href="{% url 'property_detail' bid.property.id %}">{{ bid.property.title }}</a>
+                            </h4>
+                            <span class="bid-status status-{{ bid.status }}">{{ bid.get_status_display }}</span>
+                        </div>
+                        <p class="bid-location"><i class="fas fa-map-marker-alt"></i> {{ bid.property.address }}, {{ bid.property.city }}</p>
+                        <p class="bid-date"><i class="fas fa-clock"></i> {{ bid.created_at|date:"d M Y" }}</p>
+                    </div>
+                    
+                    <!-- Bid Amount -->
+                    <div class="bid-amount-section">
+                        <div class="bid-amount">
+                            <span class="amount-label">Your Bid</span>
+                            <span class="amount-value">£{{ bid.amount }}</span>
+                        </div>
+                        {% if bid.status == 'countered' and bid.counter_amount %}
+                        <div class="counter-amount">
+                            <span class="amount-label">Counter</span>
+                            <span class="amount-value counter">£{{ bid.counter_amount }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="bid-actions">
+                        {% if bid.status == 'countered' %}
+                            <a href="{% url 'accept_counter_offer' bid.id %}" class="btn-action btn-accept">Accept</a>
+                            <a href="{% url 'withdraw_bid' bid.id %}" class="btn-action btn-decline">Decline</a>
+                        {% elif bid.status == 'pending' %}
+                            <a href="{% url 'bid_detail' bid.id %}" class="btn-action btn-view">View</a>
+                            <a href="{% url 'withdraw_bid' bid.id %}" class="btn-action btn-withdraw">Withdraw</a>
+                        {% else %}
+                            <a href="{% url 'bid_detail' bid.id %}" class="btn-action btn-view">View Details</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card shadow-sm" style="padding: 60px; text-align: center;">
+            <i class="fas fa-gavel" style="font-size: 60px; color: #ddd; margin-bottom: 20px;"></i>
+            <h4 style="color: #666; margin-bottom: 15px;">No Bids Yet</h4>
+            <p style="color: #999; margin-bottom: 25px;">You haven't placed any bids on properties.</p>
+            <a href="{% url 'property_list' %}" class="btn btn-primary" style="padding: 12px 30px;">Browse Properties</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

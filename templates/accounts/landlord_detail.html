@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ landlord.get_full_name|default:landlord.username }} - Landlord Profile{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
+    <!-- Landlord Profile Header -->
+    <div style="background: white; padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;">
+        <div style="display: flex; gap: 30px; align-items: start;">
+            <div style="flex-shrink: 0;">
+                {% if landlord.profile_picture %}
+                    <img src="{{ landlord.profile_picture.url }}" alt="{{ landlord.get_full_name }}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                    <img src="{% static 'images/lanlord-user-icon.png' %}" alt="Landlord" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+                {% endif %}
+            </div>
+            
+            <div style="flex: 1;">
+                <h1 style="color: #2c3e50; margin-bottom: 10px;">{{ landlord.get_full_name|default:landlord.username }}</h1>
+                
+                {% if profile.company_name %}
+                <p style="color: #666; font-size: 18px; margin-bottom: 15px;">{{ profile.company_name }}</p>
+                {% endif %}
+                
+                <div style="display: flex; gap: 30px; margin-bottom: 20px;">
+                    <div>
+                        <span style="color: #FFD700; font-size: 24px; font-weight: 700;">
+                            {% if profile.average_rating > 0 %}
+                            ★ {{ profile.average_rating }}
+                            {% else %}
+                            No ratings yet
+                            {% endif %}
+                        </span>
+                        <span style="color: #666; font-size: 14px; display: block;">Average Rating</span>
+                    </div>
+                    <div>
+                        <span style="color: #3EBFB5; font-size: 24px; font-weight: 700;">{{ profile.total_reviews }}</span>
+                        <span style="color: #666; font-size: 14px; display: block;">Reviews</span>
+                    </div>
+                    <div>
+                        <span style="color: #283A66; font-size: 24px; font-weight: 700;">{{ properties.count }}</span>
+                        <span style="color: #666; font-size: 14px; display: block;">Properties</span>
+                    </div>
+                </div>
+                
+                {% if profile.bio %}
+                <p style="color: #666; line-height: 1.6;">{{ profile.bio }}</p>
+                {% endif %}
+                
+                {% if user.is_authenticated and user.user_type == 'student' %}
+                    {% if can_review %}
+                    <div style="margin-top: 20px;">
+                        <a href="{% url 'add_review' landlord.id %}" class="btn btn-primary" style="padding: 12px 25px; background: #3EBFB5; color: white; text-decoration: none; border-radius: 5px; font-weight: 600; display: inline-block;">
+                            <i class="fas fa-star"></i> Leave a Review
+                        </a>
+                        <p style="color: #666; font-size: 13px; margin-top: 8px;">
+                            <i class="fas fa-check-circle" style="color: #3EBFB5;"></i> You're eligible to review this landlord
+                        </p>
+                    </div>
+                    {% else %}
+                        {% if reviews|length > 0 %}
+                            {% for review in reviews %}
+                                {% if review.student == user %}
+                                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; border-left: 3px solid #3EBFB5;">
+                                    <p style="color: #666; margin: 0; font-size: 14px;">
+                                        <i class="fas fa-info-circle"></i> You've already reviewed this landlord. 
+                                        <a href="{% url 'edit_review' review.id %}" style="color: #3EBFB5; text-decoration: none; font-weight: 600;">Edit your review</a>
+                                    </p>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                        <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 5px; border-left: 3px solid #ffc107;">
+                            <p style="color: #856404; margin: 0; font-size: 14px;">
+                                <i class="fas fa-lock"></i> You can only review landlords you've rented from. You need an active or completed rental contract to leave a review.
+                            </p>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                {% elif user.is_authenticated and user.user_type == 'landlord' %}
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; border-left: 3px solid #666;">
+                    <p style="color: #666; margin: 0; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> Only students can leave reviews.
+                    </p>
+                </div>
+                {% elif not user.is_authenticated %}
+                <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 5px; border-left: 3px solid #2196F3;">
+                    <p style="color: #0c5460; margin: 0; font-size: 14px;">
+                        <i class="fas fa-sign-in-alt"></i> <a href="{% url 'login' %}" style="color: #2196F3; text-decoration: none; font-weight: 600;">Login</a> as a student to leave a review.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Properties Section -->
+    {% if properties %}
+    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;">
+        <h2 style="color: #2c3e50; margin-bottom: 25px;">Properties ({{ properties.count }})</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            {% for property in properties %}
+            <a href="{% url 'property_detail' property.id %}" style="text-decoration: none; color: inherit;">
+                <div style="border: 1px solid #E0E0E0; border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 5px 15px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <div style="height: 200px; overflow: hidden;">
+                        {% if property.images.first %}
+                            <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'images/property.jpg' %}" alt="Property" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    <div style="padding: 15px;">
+                        <h3 style="color: #2c3e50; margin-bottom: 8px; font-size: 16px;">{{ property.title }}</h3>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 10px;">{{ property.city }}</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #3EBFB5; font-weight: 700; font-size: 18px;">£{{ property.rent_per_month }}/mo</span>
+                            <span style="color: #666; font-size: 14px;">🛏️ {{ property.bedrooms }} 🚿 {{ property.bathrooms }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Reviews Section -->
+    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <h2 style="color: #2c3e50; margin-bottom: 25px;">Reviews ({{ reviews.count }})</h2>
+        
+        {% if reviews %}
+        <div style="display: grid; gap: 20px;">
+            {% for review in reviews %}
+            <div style="border: 1px solid #E0E0E0; border-radius: 8px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div>
+                            {% if review.student.profile_picture %}
+                                <img src="{{ review.student.profile_picture.url }}" alt="{{ review.student.get_full_name }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'images/user-default-icon.png' %}" alt="Student" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div>
+                            <strong style="color: #2c3e50; display: block;">{{ review.student.get_full_name|default:review.student.username }}</strong>
+                            <small style="color: #999;">{{ review.created_at|date:"M d, Y" }}</small>
+                            {% if review.is_verified %}
+                            <span style="color: #3EBFB5; font-size: 12px; margin-left: 10px;">
+                                <i class="fas fa-check-circle"></i> Verified Tenant
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="color: #FFD700; font-size: 20px;">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <p style="color: #666; line-height: 1.6; margin-bottom: 15px;">{{ review.comment }}</p>
+                
+                {% if review.landlord_response %}
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 3px solid #3EBFB5; margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong style="color: #2c3e50; font-size: 14px;">Landlord Response</strong>
+                        <small style="color: #999;">{{ review.response_date|date:"M d, Y" }}</small>
+                    </div>
+                    <p style="color: #666; margin: 0; font-size: 14px;">{{ review.landlord_response }}</p>
+                </div>
+                {% endif %}
+                
+                {% if user.is_authenticated and user == review.student %}
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <a href="{% url 'edit_review' review.id %}" style="color: #3EBFB5; text-decoration: none; font-size: 14px;">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'delete_review' review.id %}" style="color: #e74c3c; text-decoration: none; font-size: 14px;">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: #666; padding: 40px 0;">
+            No reviews yet. Be the first to leave a review!
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

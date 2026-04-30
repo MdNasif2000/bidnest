@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Termination Request{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/contracts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="contract-container">
+    <div class="contract-header">
+        <a href="{% url 'contract_detail' contract.id %}" class="contract-back-link">
+            <i class="fas fa-arrow-left"></i> Back to Contract
+        </a>
+        <h1>Contract Termination Request</h1>
+        <p>Early termination request for {{ contract.property.title }}</p>
+    </div>
+
+    <!-- Status Banner -->
+    <div class="contract-status-banner {% if termination.status == 'approved' %}active{% elif termination.status == 'requested' %}pending{% else %}draft{% endif %}">
+        <div class="contract-status-banner-content">
+            <div>
+                <strong class="contract-status-title {% if termination.status == 'approved' %}active{% elif termination.status == 'requested' %}pending{% else %}draft{% endif %}">
+                    Status: {{ termination.get_status_display }}
+                </strong>
+                {% if termination.status == 'requested' %}
+                <p class="contract-status-description pending">Waiting for approval from the other party</p>
+                {% elif termination.status == 'approved' %}
+                <p class="contract-status-description active">Termination approved - Contract will end on {{ termination.actual_termination_date|date:"d M Y" }}</p>
+                {% elif termination.status == 'rejected' %}
+                <p class="contract-status-description">Termination request was rejected</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Details -->
+    <div class="contract-info-card">
+        <h3>Request Details</h3>
+        <div class="contract-info-grid">
+            <div class="contract-info-item">
+                <strong>Requested By</strong>
+                <p>{{ termination.requested_by.get_full_name|default:termination.requested_by.username }}</p>
+                <small style="color: #999;">{{ termination.requested_at|date:"d M Y, H:i" }}</small>
+            </div>
+            
+            <div class="contract-info-item">
+                <strong>Reason</strong>
+                <p>{{ termination.get_reason_display }}</p>
+            </div>
+            
+            <div class="contract-info-item">
+                <strong>Proposed Termination Date</strong>
+                <p class="contract-date">{{ termination.proposed_termination_date|date:"d M Y" }}</p>
+            </div>
+            
+            <div class="contract-info-item">
+                <strong>Notice Period</strong>
+                <p>{{ termination.notice_period_days }} days</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <strong style="display: block; color: #666; font-size: 14px; margin-bottom: 8px;">Details:</strong>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; white-space: pre-wrap;">{{ termination.reason_details }}</div>
+        </div>
+    </div>
+
+    <!-- Response Section -->
+    {% if termination.status != 'requested' %}
+    <div class="contract-info-card">
+        <h3>Response</h3>
+        <div class="contract-info-grid">
+            <div class="contract-info-item">
+                <strong>Responded By</strong>
+                <p>{{ termination.responded_by.get_full_name|default:termination.responded_by.username }}</p>
+                <small style="color: #999;">{{ termination.responded_at|date:"d M Y, H:i" }}</small>
+            </div>
+            
+            <div class="contract-info-item">
+                <strong>Decision</strong>
+                <p style="{% if termination.status == 'approved' %}color: #28a745;{% else %}color: #dc3545;{% endif %} font-weight: 600;">
+                    {{ termination.get_status_display }}
+                </p>
+            </div>
+        </div>
+        
+        {% if termination.response_message %}
+        <div style="margin-top: 20px;">
+            <strong style="display: block; color: #666; font-size: 14px; margin-bottom: 8px;">Response Message:</strong>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; white-space: pre-wrap;">{{ termination.response_message }}</div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons for Other Party -->
+    {% if termination.status == 'requested' and user != termination.requested_by %}
+    <div class="contract-info-card">
+        <h3>Your Response Required</h3>
+        <p style="color: #666; margin-bottom: 25px;">
+            {{ termination.requested_by.get_full_name|default:termination.requested_by.username }} has requested to terminate this contract early. 
+            Please review the details and provide your decision.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 600; color: #2c3e50; margin-bottom: 8px;">
+                    Response Message (Optional)
+                </label>
+                <textarea name="response_message" rows="4" placeholder="Add any comments or conditions..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; font-family: inherit;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" name="action" value="approve" style="flex: 1; padding: 14px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 15px; cursor: pointer;">
+                    <i class="fas fa-check"></i> Approve Termination
+                </button>
+                <button type="submit" name="action" value="reject" style="flex: 1; padding: 14px; background: #dc3545; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 15px; cursor: pointer;">
+                    <i class="fas fa-times"></i> Reject Request
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Waiting Message for Requester -->
+    {% if termination.status == 'requested' and user == termination.requested_by %}
+    <div style="background: #d1ecf1; padding: 20px; border-radius: 8px; border-left: 4px solid #17a2b8;">
+        <strong style="color: #0c5460; display: block; margin-bottom: 8px;">
+            <i class="fas fa-clock"></i> Waiting for Response
+        </strong>
+        <p style="color: #0c5460; margin: 0;">
+            Your termination request is pending approval from {{ termination.get_other_party.get_full_name|default:termination.get_other_party.username }}.
+            You will be notified once they respond.
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

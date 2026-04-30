@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messages - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messaging.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="inbox-container">
+    <div class="inbox-header">
+        <h1>Messages</h1>
+        <p>Your conversations</p>
+    </div>
+
+    <div class="inbox-list">
+        {% if conversations %}
+            {% for conversation in conversations %}
+            {% with last_message=conversation.get_last_message %}
+            <div class="conversation-item">
+                <a href="{% url 'conversation_detail' conversation.id %}" class="conversation-link">
+                    <div class="conversation-avatar">
+                        {% if user == conversation.student %}
+                            {{ conversation.landlord.username|slice:":1"|upper }}
+                        {% else %}
+                            {{ conversation.student.username|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="conversation-content">
+                        <div class="conversation-header">
+                            <h3 class="conversation-name">
+                                {% if user == conversation.student %}
+                                    {{ conversation.landlord.get_full_name|default:conversation.landlord.username }}
+                                {% else %}
+                                    {{ conversation.student.get_full_name|default:conversation.student.username }}
+                                {% endif %}
+                            </h3>
+                            {% if last_message %}
+                            <small class="conversation-time">{{ last_message.created_at|timesince }} ago</small>
+                            {% endif %}
+                        </div>
+                        
+                        {% if last_message %}
+                        <p class="conversation-preview">
+                            {% if last_message.sender == user %}
+                                <span class="sender-you">You:</span>
+                            {% endif %}
+                            {{ last_message.content|truncatewords:10 }}
+                        </p>
+                        {% else %}
+                        <p class="conversation-preview no-messages">No messages yet</p>
+                        {% endif %}
+                    </div>
+                    
+                    {% if last_message and last_message.sender != user and not last_message.is_read %}
+                    <div class="conversation-unread-badge"></div>
+                    {% endif %}
+                </a>
+                
+                <a href="{% url 'delete_conversation' conversation.id %}" class="conversation-delete-btn" onclick="return confirm('Delete this conversation?')" title="Delete conversation">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+            {% endwith %}
+            {% endfor %}
+        {% else %}
+            <div class="inbox-empty">
+                <div class="inbox-empty-icon">💬</div>
+                <h3>No conversations yet</h3>
+                <p>Start a conversation from property listings or accommodation requests</p>
+                <div style="margin-top: 20px; display: flex; gap: 15px; justify-content: center;">
+                    <a href="{% url 'property_list' %}" style="padding: 12px 24px; background: #3EBFB5; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">
+                        Browse Properties
+                    </a>
+                    <a href="{% url 'accommodation_requests' %}" style="padding: 12px 24px; background: #283A66; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">
+                        View Seeking Ads
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

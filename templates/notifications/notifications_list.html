@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="container">
+        <div class="profile-header">
+            <h1>Notifications</h1>
+            <p>Stay updated with your latest activities</p>
+        </div>
+
+        <div style="max-width: 900px; margin: 0 auto;">
+            <!-- Actions Bar -->
+            <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-weight: 600; color: #283A66;">{{ unread_count }} unread notification{{ unread_count|pluralize }}</span>
+                </div>
+                {% if unread_count > 0 %}
+                <a href="{% url 'mark_all_notifications_read' %}" style="padding: 8px 20px; background: #3EBFB5; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem;">
+                    Mark All as Read
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Notifications List -->
+            <div style="background: white; border-radius: 10px; overflow: hidden;">
+                {% if notifications %}
+                    {% for notification in notifications %}
+                    <div style="padding: 20px; border-bottom: 1px solid #E8E8E8; {% if not notification.is_read %}background: #F8FFFE;{% endif %} display: flex; gap: 15px; align-items: start; {% if notification.link %}cursor: pointer; transition: background 0.2s;{% endif %}" {% if notification.link %}onclick="window.location.href='{% url 'notification_redirect' notification.id %}'" onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='{% if not notification.is_read %}#F8FFFE{% else %}white{% endif %}'"{% endif %}>
+                        <div style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: {% if notification.notification_type == 'bid' %}#3EBFB5{% elif notification.notification_type == 'message' %}#283A66{% elif notification.notification_type == 'contract' %}#28A745{% else %}#FFC107{% endif %}; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">
+                            {% if notification.notification_type == 'bid' %}
+                                💰
+                            {% elif notification.notification_type == 'message' %}
+                                ✉️
+                            {% elif notification.notification_type == 'contract' %}
+                                📄
+                            {% elif notification.notification_type == 'payment' %}
+                                💳
+                            {% else %}
+                                🔔
+                            {% endif %}
+                        </div>
+                        
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 5px;">
+                                <h3 style="font-size: 1rem; color: #283A66; margin: 0; font-weight: 600;">{{ notification.title }}</h3>
+                                {% if not notification.is_read %}
+                                <span style="width: 8px; height: 8px; background: #3EBFB5; border-radius: 50%; flex-shrink: 0; margin-top: 6px;"></span>
+                                {% endif %}
+                            </div>
+                            <p style="color: #666; margin: 0 0 10px 0; font-size: 0.95rem;">{{ notification.message }}</p>
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                <small style="color: #999;">{{ notification.created_at|timesince }} ago</small>
+                                {% if notification.link %}
+                                <a href="{% url 'notification_redirect' notification.id %}" style="color: #3EBFB5; text-decoration: none; font-size: 0.9rem; font-weight: 500;" onclick="event.stopPropagation();">View Details →</a>
+                                {% endif %}
+                                {% if not notification.is_read %}
+                                <a href="{% url 'mark_notification_read' notification.id %}" style="color: #666; text-decoration: none; font-size: 0.85rem;" onclick="event.stopPropagation();">Mark as read</a>
+                                {% endif %}
+                                <a href="{% url 'delete_notification' notification.id %}" style="color: #DC3545; text-decoration: none; font-size: 0.85rem;" onclick="event.stopPropagation(); return confirm('Delete this notification?')">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="padding: 60px 20px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">🔔</div>
+                        <h3 style="color: #666; font-weight: 500;">No notifications yet</h3>
+                        <p style="color: #999;">You'll see notifications here when you have new activity</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

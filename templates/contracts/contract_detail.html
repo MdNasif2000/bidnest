@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contract Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/contracts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="contract-container">
+    <div class="contract-header">
+        <a href="{% url 'my_contracts' %}" class="contract-back-link">
+            <i class="fas fa-arrow-left"></i> Back to Contracts
+        </a>
+        <h1>Contract Details</h1>
+        <p>Tenancy Agreement for {{ contract.property.title }}</p>
+    </div>
+
+    <!-- Status Banner -->
+    <div class="contract-status-banner {% if contract.status == 'active' %}active{% elif contract.status == 'pending_signatures' %}pending{% else %}draft{% endif %}">
+        <div class="contract-status-banner-content">
+            <div>
+                <strong class="contract-status-title {% if contract.status == 'active' %}active{% elif contract.status == 'pending_signatures' %}pending{% else %}draft{% endif %}">
+                    Status: {{ contract.get_status_display }}
+                </strong>
+                {% if contract.status == 'pending_signatures' %}
+                <p class="contract-status-description pending">Waiting for signatures from both parties</p>
+                {% elif contract.status == 'active' %}
+                <p class="contract-status-description active">Contract is active and in effect</p>
+                {% endif %}
+            </div>
+            
+            {% if contract.status == 'pending_signatures' %}
+                {% if user == contract.student and not contract.student_signed %}
+                <a href="{% url 'sign_contract' contract.id %}" class="contract-sign-btn">
+                    <i class="fas fa-pen"></i> Sign Contract
+                </a>
+                {% elif user == contract.landlord and not contract.landlord_signed %}
+                <a href="{% url 'sign_contract' contract.id %}" class="contract-sign-btn">
+                    <i class="fas fa-pen"></i> Sign Contract
+                </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Contract Information -->
+    <div class="contract-info-card">
+        <h3>Contract Information</h3>
+        
+        <div class="contract-info-grid">
+            <div class="contract-info-item">
+                <strong>Property</strong>
+                <p>{{ contract.property.title }}</p>
+                <p class="property-address">{{ contract.property.address }}, {{ contract.property.city }}</p>
+            </div>
+            
+            <div class="contract-info-item">
+                <strong>
+                    {% if user.user_type == 'student' %}Landlord{% else %}Tenant{% endif %}
+                </strong>
+                <p>
+                    {% if user.user_type == 'student' %}
+                    {{ contract.landlord.get_full_name|default:contract.landlord.username }}
+                    {% else %}
+                    {{ contract.student.get_full_name|default:contract.student.username }}
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="contract-info-item">
+                <strong>Monthly Rent</strong>
+                <p class="contract-price">£{{ contract.monthly_rent }}</p>
+            </div>
+            
+            <div class="contract-info-item">
+                <strong>Deposit</strong>
+                <p class="contract-deposit">£{{ contract.deposit }}</p>
+            </div>
+            
+            <div class="contract-info-item">
+                <strong>Start Date</strong>
+                <p class="contract-date">{{ contract.start_date|date:"d M Y" }}</p>
+            </div>
+            
+            <div class="contract-info-item">
+                <strong>End Date</strong>
+                <p class="contract-date">{{ contract.end_date|date:"d M Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signatures -->
+    <div class="contract-info-card">
+        <h3>Signatures</h3>
+        
+        <div class="contract-signatures-grid">
+            <div class="signature-box {% if contract.student_signed %}signed{% else %}unsigned{% endif %}">
+                <div class="signature-header">
+                    {% if contract.student_signed %}
+                    <i class="fas fa-check-circle signature-icon signed"></i>
+                    {% else %}
+                    <i class="fas fa-times-circle signature-icon unsigned"></i>
+                    {% endif %}
+                    <strong>Student</strong>
+                </div>
+                <p class="signature-name">{{ contract.student.get_full_name|default:contract.student.username }}</p>
+                {% if contract.student_signed %}
+                <p class="signature-date signed">Signed on {{ contract.student_signed_at|date:"d M Y, H:i" }}</p>
+                {% else %}
+                <p class="signature-date unsigned">Not yet signed</p>
+                {% endif %}
+            </div>
+            
+            <div class="signature-box {% if contract.landlord_signed %}signed{% else %}unsigned{% endif %}">
+                <div class="signature-header">
+                    {% if contract.landlord_signed %}
+                    <i class="fas fa-check-circle signature-icon signed"></i>
+                    {% else %}
+                    <i class="fas fa-times-circle signature-icon unsigned"></i>
+                    {% endif %}
+                    <strong>Landlord</strong>
+                </div>
+                <p class="signature-name">{{ contract.landlord.get_full_name|default:contract.landlord.username }}</p>
+                {% if contract.landlord_signed %}
+                <p class="signature-date signed">Signed on {{ contract.landlord_signed_at|date:"d M Y, H:i" }}</p>
+                {% else %}
+                <p class="signature-date unsigned">Not yet signed</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Reminder for Students -->
+    {% if user.user_type == 'student' and contract.status == 'active' %}
+    <div class="review-reminder-banner">
+        <div class="review-reminder-content">
+            <div class="review-reminder-icon">⭐</div>
+            <div class="review-reminder-text">
+                <h3>Share Your Experience</h3>
+                <p>
+                    Your contract is active! You can now leave a review for {{ contract.landlord.get_full_name|default:contract.landlord.username }}.
+                </p>
+                <a href="{% url 'landlord_detail' contract.landlord.id %}" class="review-reminder-btn">
+                    <i class="fas fa-star"></i> Leave a Review
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Terms and Conditions -->
+    <div class="contract-info-card">
+        <h3>Terms and Conditions</h3>
+        <div class="contract-terms-box">{{ contract.terms_and_conditions }}</div>
+    </div>
+
+    {% if contract.special_conditions %}
+    <!-- Special Conditions -->
+    <div class="contract-info-card">
+        <h3>Special Conditions</h3>
+        <div class="contract-special-conditions">{{ contract.special_conditions }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Termination Requests -->
+    {% if contract.termination_requests.all %}
+    <div class="contract-info-card">
+        <h3>Termination Requests</h3>
+        {% for termination in contract.termination_requests.all %}
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid {% if termination.status == 'approved' %}#28a745{% elif termination.status == 'rejected' %}#dc3545{% else %}#ffc107{% endif %};">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                <div>
+                    <strong style="color: #2c3e50;">{{ termination.get_reason_display }}</strong>
+                    <p style="margin: 5px 0; color: #666; font-size: 14px;">
+                        Requested by {{ termination.requested_by.get_full_name|default:termination.requested_by.username }} 
+                        on {{ termination.requested_at|date:"d M Y" }}
+                    </p>
+                </div>
+                <span style="padding: 5px 12px; background: {% if termination.status == 'approved' %}#d4edda{% elif termination.status == 'rejected' %}#f8d7da{% else %}#fff3cd{% endif %}; color: {% if termination.status == 'approved' %}#155724{% elif termination.status == 'rejected' %}#721c24{% else %}#856404{% endif %}; border-radius: 4px; font-size: 13px; font-weight: 600;">
+                    {{ termination.get_status_display }}
+                </span>
+            </div>
+            <p style="margin: 10px 0; color: #666;">Proposed date: {{ termination.proposed_termination_date|date:"d M Y" }}</p>
+            <a href="{% url 'termination_detail' contract.id termination.id %}" style="color: #3EBFB5; text-decoration: none; font-weight: 600;">
+                View Details <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    {% if contract.status == 'active' %}
+    <div style="display: flex; gap: 15px; margin-top: 30px;">
+        <a href="{% url 'request_termination' contract.id %}" style="flex: 1; padding: 14px; background: #dc3545; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; text-align: center;">
+            <i class="fas fa-file-contract"></i> Request Early Termination
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

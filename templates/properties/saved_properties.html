@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Saved Properties - BidNest{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/properties.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="property-search-page">
+    <div class="container">
+        <div class="profile-header" style="margin-bottom: 30px;">
+            <h1>Saved Properties</h1>
+            <p>Properties you've saved for later</p>
+        </div>
+
+        {% if saved_properties %}
+        <div class="property-grid">
+            {% for saved in saved_properties %}
+            <div class="listing-card" data-property-id="{{ saved.property.id }}" style="cursor: pointer;">
+                <div class="listing-badge">Saved</div>
+                <div class="listing-image-placeholder">
+                    {% if saved.property.images.first %}
+                    <img src="{{ saved.property.images.first.image.url }}" alt="{{ saved.property.title }}" class="listing-image">
+                    {% else %}
+                    <img src="{% static 'images/property.jpg' %}" alt="Property" class="listing-image">
+                    {% endif %}
+                </div>
+                <div class="listing-info">
+                    <h3 class="listing-title">{{ saved.property.title }}</h3>
+                    <div class="listing-prices">
+                        <div class="price-row">
+                            <span class="price-label">Starting Bid:</span>
+                            <span class="price-value">£{{ saved.property.starting_bid }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Current Bid:</span>
+                            <span class="price-value">£{{ saved.property.current_bid }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Rent:</span>
+                            <span class="price-value">£{{ saved.property.rent_per_month }}</span>
+                        </div>
+                    </div>
+                    <div class="listing-features">
+                        <span>🛏️ {{ saved.property.bedrooms }}</span>
+                        <span>🚿 {{ saved.property.bathrooms }}</span>
+                        {% if saved.property.wifi %}<span>📶 WiFi</span>{% endif %}
+                    </div>
+                    <p class="listing-description">{{ saved.property.description|truncatewords:15 }}</p>
+                    <div class="listing-actions">
+                        <a href="{% url 'place_bid' saved.property.id %}" class="btn-place-bid" onclick="event.stopPropagation()">Place Bid</a>
+                        <a href="{% url 'unsave_property' saved.property.id %}" class="btn-message-landlord" onclick="event.stopPropagation()" style="background: #DC3545;">Remove</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-results" style="text-align: center; padding: 60px 20px; background: white; border-radius: 10px;">
+            <h2 style="color: #666; margin-bottom: 15px;">No Saved Properties</h2>
+            <p style="color: #999; margin-bottom: 25px;">You haven't saved any properties yet. Start browsing to find your perfect accommodation!</p>
+            <a href="{% url 'property_list' %}?property_type_filter=all" class="btn-primary" style="display: inline-block; padding: 12px 30px; background: #283A66; color: white; text-decoration: none; border-radius: 5px; font-weight: 600;">Browse Properties</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Make listing cards clickable
+document.addEventListener('click', function(e) {
+    const card = e.target.closest('.listing-card');
+    if (card && card.dataset.propertyId) {
+        // Don't navigate if clicking on action buttons
+        if (!e.target.closest('.listing-actions')) {
+            window.location.href = '/properties/' + card.dataset.propertyId + '/';
+        }
+    }
+});
+</script>
+{% endblock %}
