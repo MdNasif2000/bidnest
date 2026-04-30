@@ -84,7 +84,7 @@ DATABASES = {
     }
 }
 
-# Note: For production with high traffic, consider PostgreSQL
+# For production with high traffic, PostgreSQL configuration
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
@@ -194,6 +194,8 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+
+#to be implemented later
 # Stripe Configuration
 STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='')
 STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
